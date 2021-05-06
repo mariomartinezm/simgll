@@ -235,8 +235,15 @@ int main()
                                                              sizeof(Particle),
                                                              GL_MAP_READ_BIT));
 
-            bestPosition = getBestPosition(p);
+            glm::vec3 currentBestPosition = getBestPosition(p);
+
+            if(goldsteinPrice(currentBestPosition) < goldsteinPrice(bestPosition))
+            {
+                bestPosition = currentBestPosition;
+            }
+
             std::cout << bestPosition.x << " " << bestPosition.y << " " << bestPosition.z << "\n";
+            std::cout << goldsteinPrice(bestPosition) << "\n";
 
             glUnmapBuffer(GL_ARRAY_BUFFER);
 
