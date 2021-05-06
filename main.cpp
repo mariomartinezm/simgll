@@ -19,7 +19,7 @@ constexpr GLfloat PSO_UPDATE_TIME = 0.016F;
 enum
 {
     WORKGROUP_SIZE  = 16,
-    NUM_WORKGROUPS  = 2,
+    NUM_WORKGROUPS  = 3,
     SWARM_SIZE      = (NUM_WORKGROUPS * WORKGROUP_SIZE)
 };
 
