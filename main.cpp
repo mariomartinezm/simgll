@@ -33,13 +33,8 @@ struct Particle
     float fitness;
 };
 
-GLfloat goldsteinPrice(glm::vec2 p)
-{
-    return (1  + (p.x + p.y + 1) * (p.x + p.y + 1) *
-           (19 - 14 * p.x + 3 * p.x * p.x - 14 * p.y + 6 * p.x * p.y + 3 * p.y * p.y)) *
-           (30 + (2 * p.x - 3 * p.y) * (2 * p.x - 3 * p.y) *
-           (18 - 32 * p.x + 12 * p.x * p.x + 48 * p.y - 36 * p.x * p.y + 27 * p.y * p.y));
-}
+// Test functions
+GLfloat goldsteinPrice(glm::vec2 p);
 
 glm::vec3 getBestPosition(Particle* p);
 
@@ -300,4 +295,12 @@ GLvoid error_callback(GLint error, const GLchar* description)
 {
     std::cerr << "GLFW error " << error << ": " << description << "\n";
     exit(1);
+}
+
+GLfloat goldsteinPrice(glm::vec2 p)
+{
+    return (1  + (p.x + p.y + 1) * (p.x + p.y + 1) *
+           (19 - 14 * p.x + 3 * p.x * p.x - 14 * p.y + 6 * p.x * p.y + 3 * p.y * p.y)) *
+           (30 + (2 * p.x - 3 * p.y) * (2 * p.x - 3 * p.y) *
+           (18 - 32 * p.x + 12 * p.x * p.x + 48 * p.y - 36 * p.x * p.y + 27 * p.y * p.y));
 }
