@@ -4,6 +4,7 @@ layout (local_size_x = 16) in;
 
 uniform float omega;
 uniform vec3 bestPosition;
+uniform uint cpuSeed;
 
 struct Particle
 {
@@ -31,17 +32,20 @@ float goldsteinPrice(vec2 p)
            (18 - 32 * p.x + 12 * p.x * p.x + 48 * p.y - 36 * p.x * p.y + 27 * p.y * p.y));
 }
 
-int random(int seed, int iterations)
+uvec2 tea(uvec2 v, int rounds)
 {
-    int value = seed;
-    int n;
+    const uvec4 key = {0xa341316c, 0xc8013ea4, 0xad90777d, 0x7e95761e};
+    const uint delta = 0x9e3779b9;
+    uint sum = 0;
 
-    for(n = 0; n < iterations; n++)
+    for(int i = 0; i < rounds; i++)
     {
-        value = ((value >> 7) ^ (value << 9)) * 15485863;
+        sum += delta;
+        v[0] += ((v[1] << 4) + key[0]) ^ (v[1] + sum) ^ ((v[1] >> 5) + key[1]);
+        v[1] += ((v[0] << 4) + key[2]) ^ (v[0] + sum) ^ ((v[0] >> 5) + key[3]);
     }
 
-    return value;
+    return v;
 }
 
 void main()
@@ -51,11 +55,11 @@ void main()
     Particle pIn  = inputData.particles[globalId];
     Particle pOut;
 
-    int r1 = random(globalId, 4);
-    int r2 = random(r1, 2);
+    uvec2 seed = gl_GlobalInvocationID.xy * cpuSeed;
+    uvec2 rand = tea(seed, 5);
 
-    float k1 = (r1 & 0x3FF) / 1024.0;
-    float k2 = (r2 & 0x3FF) / 1024.0;
+    float k1 = float(rand[0]) / 4294967296.0;
+    float k2 = float(rand[1]) / 4294967296.0;
 
     pOut.velocity = omega * pIn.velocity +
         2.0 * k1 * (pIn.bestPosition - pIn.position) +

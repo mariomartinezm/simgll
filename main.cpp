@@ -99,7 +99,8 @@ int main()
     psoProgram.addShader("pso.glsl", GL_COMPUTE_SHADER);
     psoProgram.compile();
 
-    GLint omegaLocation = glGetUniformLocation(psoProgram.name(), "omega");
+    GLint omegaLocation   = glGetUniformLocation(psoProgram.name(), "omega");
+    GLint cpuSeedLocation = glGetUniformLocation(psoProgram.name(), "cpuSeed");
 
     // Create swarm buffers
     GLuint psoBuffers[2];
@@ -220,6 +221,7 @@ int main()
 
             glUniform1f(omegaLocation, omega);
             glUniform3f(bestPositionLocation, bestPosition.x, bestPosition.y, bestPosition.z);
+            glUniform1ui(cpuSeedLocation, rand());
 
             // Bind buffers for compute shader
             glBindBufferBase(GL_SHADER_STORAGE_BUFFER, 0, psoBuffers[frameIndex]);
