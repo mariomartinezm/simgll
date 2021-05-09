@@ -24,12 +24,25 @@ layout (std430, binding = 1) buffer outSwarm
     Particle particles[];
 } outputData;
 
-float goldsteinPrice(vec2 p)
+float goldsteinPrice(vec3 p)
 {
     return (1  + (p.x + p.y + 1) * (p.x + p.y + 1) *
            (19 - 14 * p.x + 3 * p.x * p.x - 14 * p.y + 6 * p.x * p.y + 3 * p.y * p.y)) *
            (30 + (2 * p.x - 3 * p.y) * (2 * p.x - 3 * p.y) *
            (18 - 32 * p.x + 12 * p.x * p.x + 48 * p.y - 36 * p.x * p.y + 27 * p.y * p.y));
+}
+
+float rastrigin3D(vec3 p)
+{
+    int a = 10;
+    float s = a * 3.0F;
+    float PI = 3.1415926535;
+
+    s += p.x * p.x - a * cos(2 * PI * p.x);
+    s += p.y * p.y - a * cos(2 * PI * p.y);
+    s += p.z * p.z - a * cos(2 * PI * p.z);
+
+    return s;
 }
 
 uvec2 tea(uvec2 v, int rounds)
@@ -73,7 +86,8 @@ void main()
     }
 
     pOut.position = pIn.position + pOut.velocity;
-    pOut.fitness  = goldsteinPrice(pOut.position.xy);
+    pOut.fitness  = goldsteinPrice(pOut.position);
+    /*pOut.fitness = rastrigin3D(pOut.position);*/
 
     if(pOut.fitness < pIn.fitness)
     {

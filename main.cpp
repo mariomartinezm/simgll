@@ -1,5 +1,6 @@
 #include <iostream>
 #include <cstdlib>
+#include <cmath>
 #include <random>
 #include <chrono>
 #include <GL/glew.h>
@@ -15,6 +16,7 @@ constexpr GLuint WIDTH            = 512;
 constexpr GLuint HEIGHT           = 512;
 constexpr GLint NUM_ITER          = 10000;
 constexpr GLfloat PSO_UPDATE_TIME = 0.016F;
+constexpr float PI                = 3.1415926535F;
 
 enum
 {
@@ -35,6 +37,7 @@ struct Particle
 
 // Test functions
 GLfloat goldsteinPrice(glm::vec2 p);
+GLfloat rastrigin3D(const glm::vec3& p);
 
 glm::vec3 getBestPosition(Particle* p);
 
@@ -131,7 +134,9 @@ int main()
         glMapBufferRange(GL_ARRAY_BUFFER, 0, SWARM_SIZE * sizeof(Particle),
                          GL_MAP_WRITE_BIT | GL_MAP_INVALIDATE_BUFFER_BIT));
 
-    // Initialize position and velocity
+    // Initialize position, velocity and fitness
+    auto f = goldsteinPrice;
+
     for(int i = 0; i < SWARM_SIZE; ++i)
     {
         p[i].position.x = dist(engine);
@@ -144,7 +149,7 @@ int main()
 
         p[i].bestPosition = p[i].position;
 
-        p[i].fitness = goldsteinPrice(p[i].position);
+        p[i].fitness = f(p[i].position);
     }
 
     glm::vec3 bestPosition = getBestPosition(p);
@@ -234,13 +239,13 @@ int main()
 
             glm::vec3 currentBestPosition = getBestPosition(p);
 
-            if(goldsteinPrice(currentBestPosition) < goldsteinPrice(bestPosition))
+            if(f(currentBestPosition) < f(bestPosition))
             {
                 bestPosition = currentBestPosition;
             }
 
             std::cout << bestPosition.x << " " << bestPosition.y << " " << bestPosition.z << "\n";
-            std::cout << goldsteinPrice(bestPosition) << "\n";
+            std::cout << f(bestPosition) << "\n";
 
             glUnmapBuffer(GL_ARRAY_BUFFER);
 
@@ -297,10 +302,26 @@ GLvoid error_callback(GLint error, const GLchar* description)
     exit(1);
 }
 
+// Global minimum = f(0, -1) = 3
+// Search domain = -2.0 <= pi <= 2.0
 GLfloat goldsteinPrice(glm::vec2 p)
 {
     return (1  + (p.x + p.y + 1) * (p.x + p.y + 1) *
            (19 - 14 * p.x + 3 * p.x * p.x - 14 * p.y + 6 * p.x * p.y + 3 * p.y * p.y)) *
            (30 + (2 * p.x - 3 * p.y) * (2 * p.x - 3 * p.y) *
            (18 - 32 * p.x + 12 * p.x * p.x + 48 * p.y - 36 * p.x * p.y + 27 * p.y * p.y));
+}
+
+// Global minimum = f(0, ..., 0) = 0
+// Search domain  = -5.12 <= pi <= 5.12
+GLfloat rastrigin3D(const glm::vec3& p)
+{
+    constexpr int a = 10;
+    float s = a * 3.0F;
+
+    s += p.x * p.x - a * cosf(2 * PI * p.x);
+    s += p.y * p.y - a * cosf(2 * PI * p.y);
+    s += p.z * p.z - a * cosf(2 * PI * p.z);
+
+    return s;
 }
