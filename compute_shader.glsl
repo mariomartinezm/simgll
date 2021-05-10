@@ -3,23 +3,53 @@
 layout(local_size_x = 32, local_size_y = 32) in;
 layout(binding = 0, rgba32f) uniform image2D imgOutput;
 
-vec3 getBackgroundColor(vec3 rayDirection)
+struct Ray
 {
-    vec3 normDirection = normalize(rayDirection);
-    float t = 0.5 * (normDirection.y + 1.0);
-    return (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
-}
+    vec3 origin;
+    vec3 direction;
+};
 
-bool isSphereHit(vec3 center, float radius, vec3 rayOrigin, vec3 rayDirection)
+float sphereHit(vec3 center, float radius, Ray ray)
 {
-    vec3 oc = rayOrigin - center;
+    vec3 oc = ray.origin - center;
 
-    float a = dot(rayDirection, rayDirection);
-    float b = 2.0 * dot(oc, rayDirection);
+    float a = dot(ray.direction, ray.direction);
+    float b = 2.0 * dot(oc, ray.direction);
     float c = dot(oc, oc) - radius * radius;
     float discriminant = b * b - 4 * a * c;
 
-    return (discriminant > 0);
+    if(discriminant < 0)
+    {
+        return -1.0;
+    }
+    else
+    {
+        return (-b - sqrt(discriminant)) / (2.0 * a);
+    }
+}
+
+vec3 pointAtParameter(Ray ray, float t)
+{
+    return ray.origin + t * ray.direction;
+}
+
+vec3 getColor(Ray ray)
+{
+    vec3 sphereCenter  = vec3(0.0, 0.0, -5.0);
+    float sphereRadius = 3.0;
+
+    float t = sphereHit(sphereCenter, sphereRadius, ray);
+
+    if(t > 0.0)
+    {
+        vec3 normal = normalize(pointAtParameter(ray, t) - sphereCenter);
+
+        return 0.5 * vec3(normal.x + 1, normal.y + 1, normal.z + 1);
+    }
+
+    vec3 normDirection = normalize(ray.direction);
+    t = 0.5 * (normDirection.y + 1.0);
+    return (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
 }
 
 void main()
@@ -37,18 +67,10 @@ void main()
     float u = float(pixelCoords.x) / dims.x;
     float v = float(pixelCoords.y) / dims.y;
 
-    vec3 rayOrigin    = vec3(0.0, 0.0, 0.0);
-    vec3 rayDirection = lowerLeftCorner + u * horizontal + v * vertical;
+    // Create a ray to each pixel of the output texture
+    Ray ray = Ray(vec3(0), lowerLeftCorner + u * horizontal + v * vertical);
 
-    vec3 sphereCenter  = vec3(0.0, 0.0, -5.0);
-    float sphereRadius = 3.0;
-
-    vec4 pixel = vec4(getBackgroundColor(rayDirection), 1.0);
-
-    if(isSphereHit(sphereCenter, sphereRadius, rayOrigin, rayDirection))
-    {
-        pixel = vec4(1.0, 0.0, 0.0, 1.0);
-    }
+    vec4 pixel = vec4(getColor(ray), 1.0);
 
     imageStore(imgOutput, pixelCoords, pixel);
 }
