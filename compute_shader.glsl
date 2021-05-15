@@ -1,9 +1,6 @@
 #version 450 core
 
 #define FLT_MAX 3.402823466e+38
-#define FLT_MIN 1.175494351e-38
-#define DBL_MAX 1.7976931348623158e+308
-#define DBL_MIN 2.2250738585072014e-308
 
 layout(local_size_x = 32, local_size_y = 32) in;
 layout(binding = 0, rgba32f) uniform image2D imgOutput;
@@ -14,13 +11,20 @@ struct Ray
     vec3 direction;
 };
 
-float sphereHit(vec3 center, float radius, Ray ray, float tmin, float tmax)
+struct Sphere
 {
-    vec3 oc = ray.origin - center;
+    vec3 center;
+    float radius;
+    float t;
+};
+
+float sphereHit(Sphere sphere, Ray ray, float tmin, float tmax)
+{
+    vec3 oc = ray.origin - sphere.center;
 
     float a = dot(ray.direction, ray.direction);
     float b = 2.0 * dot(oc, ray.direction);
-    float c = dot(oc, oc) - radius * radius;
+    float c = dot(oc, oc) - sphere.radius * sphere.radius;
     float discriminant = b * b - 4 * a * c;
     float t;
 
@@ -79,34 +83,26 @@ void main()
     // Create a ray to each pixel of the output texture
     Ray ray = Ray(vec3(0), lowerLeftCorner + u * horizontal + v * vertical);
 
-    vec3 sphereCenter  = vec3(0.0, 0.0, -5.0);
-    float sphereRadius = 2.5;
+    Sphere spheres[2];
+    spheres[0] = Sphere(vec3(0.0, 0.0, -5.0), 2.5, -1.0);
+    spheres[1] = Sphere(vec3(0.0, -502.5, -5.0), 500, -1.0);
 
     float tmin = 0.0;
     float tmax = FLT_MAX;
 
-    float t1 = sphereHit(sphereCenter, sphereRadius, ray, tmin, tmax);
-
-    vec3 sphereCenter2 = vec3(0.0, -502.5, -5.0);
-    float sphereRadius2 = 500.0;
-
-    if(t1 > 0.0)
+    int hitIndex = 0;
+    for(int i = 0; i < spheres.length(); i++)
     {
-        tmax = t1;
+        spheres[i].t = sphereHit(spheres[i], ray, tmin, tmax);
+
+        if(spheres[i].t > 0.0)
+        {
+            tmax = spheres[i].t;
+            hitIndex = i;
+        }
     }
 
-    float t2 = sphereHit(sphereCenter2, sphereRadius2, ray, tmin, tmax);
-
-    if(t2 > 0.0)
-    {
-        vec3 normal2 = normalize(pointAtParameter(ray, t2) - sphereCenter2);
-        vec4 pixel = vec4(getColor(t2, ray, normal2), 1.0);
-        imageStore(imgOutput, pixelCoords, pixel);
-    }
-    else
-    {
-        vec3 normal1 = normalize(pointAtParameter(ray, t1) - sphereCenter);
-        vec4 pixel = vec4(getColor(t1, ray, normal1), 1.0);
-        imageStore(imgOutput, pixelCoords, pixel);
-    }
+    vec3 normal = normalize(pointAtParameter(ray, spheres[hitIndex].t) - spheres[hitIndex].center);
+    vec4 pixel = vec4(getColor(spheres[hitIndex].t, ray, normal), 1.0);
+    imageStore(imgOutput, pixelCoords, pixel);
 }
