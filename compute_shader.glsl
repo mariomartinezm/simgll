@@ -5,6 +5,8 @@
 layout(local_size_x = 32, local_size_y = 32) in;
 layout(binding = 0, rgba32f) uniform image2D imgOutput;
 
+uniform uint cpuSeed;
+
 struct Ray
 {
     vec3 origin;
@@ -17,6 +19,26 @@ struct Sphere
     float radius;
     float t;
 };
+
+uint rand_pcg(inout uint rng_state)
+{
+    uint state = rng_state;
+    rng_state = rng_state * 747796405u + 2891336453u;
+    uint word = ((state >> ((state >> 28u) + 4u)) ^ state) * 277803737u;
+    return (word >> 22u) ^ word;
+}
+
+vec3 randomUnitVector(inout uint rng_state)
+{
+    vec3 p = vec3(float(rand_pcg(rng_state)) / 4294967296.0,
+                  float(rand_pcg(rng_state)) / 4294967296.0,
+                  float(rand_pcg(rng_state)) / 4294967296.0);
+
+    p = 2.0 * p - vec3(1.0);
+    p = normalize(p);
+
+    return p;
+}
 
 float sphereHit(Sphere sphere, Ray ray, float tmin, float tmax)
 {
@@ -71,38 +93,80 @@ void main()
 
     // get index in global work group, i.e., x, y position
     ivec2 pixelCoords = ivec2(gl_GlobalInvocationID.xy);
+    uint seed = (dims.x * gl_GlobalInvocationID.y + gl_GlobalInvocationID.x) * cpuSeed;
 
     // camera settings
     vec3 lowerLeftCorner = vec3(-2.0, -2.0, -1.0);
     vec3 horizontal      = vec3(4.0, 0.0, 0.0);
     vec3 vertical        = vec3(0.0, 4.0, 0.0);
 
-    float u = float(pixelCoords.x) / dims.x;
-    float v = float(pixelCoords.y) / dims.y;
-
-    // Create a ray to each pixel of the output texture
-    Ray ray = Ray(vec3(0), lowerLeftCorner + u * horizontal + v * vertical);
-
     Sphere spheres[2];
     spheres[0] = Sphere(vec3(0.0, 0.0, -5.0), 2.5, -1.0);
     spheres[1] = Sphere(vec3(0.0, -502.5, -5.0), 500, -1.0);
 
-    float tmin = 0.0;
-    float tmax = FLT_MAX;
+    // Initialize color of the hitpoint
+    vec4 pixel = vec4(vec3(0.0), 1.0);
 
-    int hitIndex = 0;
-    for(int i = 0; i < spheres.length(); i++)
+    for(int j = 0; j < 100; j++)
     {
-        spheres[i].t = sphereHit(spheres[i], ray, tmin, tmax);
+        float u = float(pixelCoords.x + float(rand_pcg(seed)) / 4294967296.0) / (dims.x - 1);
+        float v = float(pixelCoords.y + float(rand_pcg(seed)) / 4294967296.0) / (dims.y - 1);
 
-        if(spheres[i].t > 0.0)
+        // Create a ray to each pixel of the output texture
+        Ray ray = Ray(vec3(0), lowerLeftCorner + u * horizontal + v * vertical);
+
+        float tmin = 0.0;
+        float tmax = FLT_MAX;
+
+        int hitIndex = 0;
+        for(int i = 0; i < spheres.length(); i++)
         {
-            tmax = spheres[i].t;
-            hitIndex = i;
+            spheres[i].t = sphereHit(spheres[i], ray, tmin, tmax);
+
+            if(spheres[i].t > 0.0)
+            {
+                tmax = spheres[i].t;
+                hitIndex = i;
+            }
         }
+
+        // Calculate the hit point's position and normal
+        float t     = spheres[hitIndex].t;
+        vec3 p      = pointAtParameter(ray, t);
+        vec3 normal = normalize(p - spheres[hitIndex].center);
+
+        tmax = FLT_MAX;
+
+        vec3 factor = vec3(1.0);
+        while(t > 0.0)
+        {
+            vec3 target = p + normal + randomUnitVector(seed);
+            ray = Ray(p, target - p);
+
+            hitIndex = 0;
+            for(int i = 0; i < spheres.length(); i++)
+            {
+                spheres[i].t = sphereHit(spheres[i], ray, tmin, tmax);
+
+                if(spheres[i].t > 0.0)
+                {
+                    tmax = spheres[i].t;
+                    hitIndex = i;
+                }
+            }
+
+            if(t > 0.0)
+            {
+                t      = spheres[hitIndex].t;
+                p      = pointAtParameter(ray, t);
+                normal = normalize(p - spheres[hitIndex].center);
+
+                factor *= 0.5;
+            }
+        }
+
+        pixel += vec4(0.01 * factor * getColor(-1, ray, normal), 1.0);
     }
 
-    vec3 normal = normalize(pointAtParameter(ray, spheres[hitIndex].t) - spheres[hitIndex].center);
-    vec4 pixel = vec4(getColor(spheres[hitIndex].t, ray, normal), 1.0);
     imageStore(imgOutput, pixelCoords, pixel);
 }

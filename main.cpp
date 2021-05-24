@@ -56,6 +56,8 @@ int main()
     computeProgram.addShader("compute_shader.glsl", GL_COMPUTE_SHADER);
     computeProgram.compile();
 
+    GLint cpuSeedLocation = glGetUniformLocation(computeProgram.name(), "cpuSeed");
+
     ShaderProgram renderProgram;
     renderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
     renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
@@ -74,6 +76,7 @@ int main()
     while(!glfwWindowShouldClose(window))
     {
         glUseProgram(computeProgram.name());
+        glUniform1ui(cpuSeedLocation, rand());
 
         glBindImageTexture(0, texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
