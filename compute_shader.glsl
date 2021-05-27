@@ -73,6 +73,26 @@ float sphereHit(Sphere sphere, Ray ray, float tmin, float tmax)
     return -1.0;
 }
 
+int worldHit(inout Sphere spheres[NUM_SPHERES], Ray ray)
+{
+    float tmin = 0.0;
+    float tmax = FLT_MAX;
+
+    int hitIndex = -1;
+    for(int i = 0; i < NUM_SPHERES; i++)
+    {
+        spheres[i].t = sphereHit(spheres[i], ray, tmin, tmax);
+
+        if(spheres[i].t > 0.0)
+        {
+            tmax = spheres[i].t;
+            hitIndex = i;
+        }
+    }
+
+    return hitIndex;
+}
+
 vec3 pointAtParameter(Ray ray, float t)
 {
     return ray.origin + t * ray.direction;
@@ -113,27 +133,12 @@ void main()
         // Create a ray to each pixel of the output texture
         Ray ray = Ray(vec3(0), lowerLeftCorner + u * horizontal + v * vertical);
 
-        float tmin = 0.0;
-        float tmax = FLT_MAX;
-
-        int hitIndex = -1;
-        for(int i = 0; i < NUM_SPHERES; i++)
-        {
-            spheres[i].t = sphereHit(spheres[i], ray, tmin, tmax);
-
-            if(spheres[i].t > 0.0)
-            {
-                tmax = spheres[i].t;
-                hitIndex = i;
-            }
-        }
+        int hitIndex = worldHit(spheres, ray);
 
         // Calculate the hit point's position and normal
         float t     = spheres[hitIndex].t;
         vec3 p      = pointAtParameter(ray, t);
         vec3 normal = normalize(p - spheres[hitIndex].center);
-
-        tmax = FLT_MAX;
 
         vec3 reflection = vec3(1.0);
         if(hitIndex >= 0)
@@ -146,17 +151,7 @@ void main()
             vec3 target = p + normal + randomUnitVector(seed);
             ray = Ray(p, target - p);
 
-            hitIndex = -1;
-            for(int i = 0; i < spheres.length(); i++)
-            {
-                spheres[i].t = sphereHit(spheres[i], ray, tmin, tmax);
-
-                if(spheres[i].t > 0.0)
-                {
-                    tmax = spheres[i].t;
-                    hitIndex = i;
-                }
-            }
+            hitIndex = worldHit(spheres, ray);
 
             if(hitIndex >= 0)
             {
