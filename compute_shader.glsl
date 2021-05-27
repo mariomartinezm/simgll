@@ -1,6 +1,9 @@
 #version 450 core
 
-#define FLT_MAX 3.402823466e+38
+const float FLT_MAX     = 3.402823466e+38;
+const float INT_MAX     = 4294967296.0;
+const int   NUM_SPHERES = 2;
+const int   NUM_SAMPLES = 100;
 
 layout(local_size_x = 32, local_size_y = 32) in;
 layout(binding = 0, rgba32f) uniform image2D imgOutput;
@@ -30,9 +33,9 @@ uint rand_pcg(inout uint rng_state)
 
 vec3 randomUnitVector(inout uint rng_state)
 {
-    vec3 p = vec3(float(rand_pcg(rng_state)) / 4294967296.0,
-                  float(rand_pcg(rng_state)) / 4294967296.0,
-                  float(rand_pcg(rng_state)) / 4294967296.0);
+    vec3 p = vec3(float(rand_pcg(rng_state)) / INT_MAX,
+                  float(rand_pcg(rng_state)) / INT_MAX,
+                  float(rand_pcg(rng_state)) / INT_MAX);
 
     p = 2.0 * p - vec3(1.0);
     p = normalize(p);
@@ -107,7 +110,7 @@ void main()
     // Initialize color of the hitpoint
     vec4 pixel = vec4(vec3(0.0), 1.0);
 
-    for(int j = 0; j < 100; j++)
+    for(int j = 0; j < NUM_SAMPLES; j++)
     {
         float u = float(pixelCoords.x + float(rand_pcg(seed)) / 4294967296.0) / (dims.x - 1);
         float v = float(pixelCoords.y + float(rand_pcg(seed)) / 4294967296.0) / (dims.y - 1);
