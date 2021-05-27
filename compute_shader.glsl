@@ -78,15 +78,10 @@ vec3 pointAtParameter(Ray ray, float t)
     return ray.origin + t * ray.direction;
 }
 
-vec3 getColor(float t, Ray ray, vec3 normal)
+vec3 getColor(Ray ray)
 {
-    if(t > 0.0)
-    {
-        return 0.5 * vec3(normal.x + 1, normal.y + 1, normal.z + 1);
-    }
-
     vec3 dirNormalized = normalize(ray.direction);
-    t = 0.5 * (dirNormalized.y + 1.0);
+    float t = 0.5 * (dirNormalized.y + 1.0);
     return (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
 }
 
