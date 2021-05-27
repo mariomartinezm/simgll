@@ -118,8 +118,8 @@ void main()
         float tmin = 0.0;
         float tmax = FLT_MAX;
 
-        int hitIndex = 0;
-        for(int i = 0; i < spheres.length(); i++)
+        int hitIndex = -1;
+        for(int i = 0; i < NUM_SPHERES; i++)
         {
             spheres[i].t = sphereHit(spheres[i], ray, tmin, tmax);
 
@@ -137,13 +137,18 @@ void main()
 
         tmax = FLT_MAX;
 
-        vec3 factor = vec3(1.0);
-        while(t > 0.0)
+        vec3 reflection = vec3(1.0);
+        if(hitIndex >= 0)
+        {
+            reflection = vec3(0.5);
+        }
+
+        while(hitIndex >= 0)
         {
             vec3 target = p + normal + randomUnitVector(seed);
             ray = Ray(p, target - p);
 
-            hitIndex = 0;
+            hitIndex = -1;
             for(int i = 0; i < spheres.length(); i++)
             {
                 spheres[i].t = sphereHit(spheres[i], ray, tmin, tmax);
@@ -155,17 +160,17 @@ void main()
                 }
             }
 
-            if(t > 0.0)
+            if(hitIndex >= 0)
             {
                 t      = spheres[hitIndex].t;
                 p      = pointAtParameter(ray, t);
                 normal = normalize(p - spheres[hitIndex].center);
 
-                factor *= 0.5;
+                reflection *= 0.5;
             }
         }
 
-        pixel += vec4(0.01 * factor * getColor(-1, ray, normal), 1.0);
+        pixel += vec4((1.0 / NUM_SAMPLES) * reflection * getColor(ray), 1.0);
     }
 
     imageStore(imgOutput, pixelCoords, pixel);
