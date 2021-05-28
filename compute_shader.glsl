@@ -132,13 +132,7 @@ void main()
 
         // Create a ray to each pixel of the output texture
         Ray ray = Ray(vec3(0), lowerLeftCorner + u * horizontal + v * vertical);
-
         int hitIndex = worldHit(spheres, ray);
-
-        // Calculate the hit point's position and normal
-        float t     = spheres[hitIndex].t;
-        vec3 p      = pointAtParameter(ray, t);
-        vec3 normal = normalize(p - spheres[hitIndex].center);
 
         vec3 reflection = vec3(1.0);
         if(hitIndex >= 0)
@@ -148,17 +142,18 @@ void main()
 
         while(hitIndex >= 0)
         {
-            vec3 target = p + normal + randomUnitVector(seed);
-            ray = Ray(p, target - p);
+            // Calculate the hit point's position and normal
+            float t     = spheres[hitIndex].t;
+            vec3 p      = pointAtParameter(ray, t);
+            vec3 normal = normalize(p - spheres[hitIndex].center);
 
+            vec3 target = p + normal + randomUnitVector(seed);
+
+            ray = Ray(p, target - p);
             hitIndex = worldHit(spheres, ray);
 
             if(hitIndex >= 0)
             {
-                t      = spheres[hitIndex].t;
-                p      = pointAtParameter(ray, t);
-                normal = normalize(p - spheres[hitIndex].center);
-
                 reflection *= 0.5;
             }
         }
