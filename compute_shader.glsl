@@ -135,10 +135,6 @@ void main()
         int hitIndex = worldHit(spheres, ray);
 
         vec3 reflection = vec3(1.0);
-        if(hitIndex >= 0)
-        {
-            reflection = vec3(0.5);
-        }
 
         while(hitIndex >= 0)
         {
@@ -146,16 +142,12 @@ void main()
             float t     = spheres[hitIndex].t;
             vec3 p      = pointAtParameter(ray, t);
             vec3 normal = normalize(p - spheres[hitIndex].center);
+            reflection *= 0.5;
 
             vec3 target = p + normal + randomUnitVector(seed);
 
             ray = Ray(p, target - p);
             hitIndex = worldHit(spheres, ray);
-
-            if(hitIndex >= 0)
-            {
-                reflection *= 0.5;
-            }
         }
 
         pixel += vec4((1.0 / NUM_SAMPLES) * reflection * getColor(ray), 1.0);
