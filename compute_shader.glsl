@@ -127,8 +127,8 @@ void main()
 
     for(int j = 0; j < NUM_SAMPLES; j++)
     {
-        float u = float(pixelCoords.x + float(rand_pcg(seed)) / 4294967296.0) / (dims.x - 1);
-        float v = float(pixelCoords.y + float(rand_pcg(seed)) / 4294967296.0) / (dims.y - 1);
+        float u = float(pixelCoords.x + float(rand_pcg(seed)) / INT_MAX) / (dims.x - 1);
+        float v = float(pixelCoords.y + float(rand_pcg(seed)) / INT_MAX) / (dims.y - 1);
 
         // Create a ray to each pixel of the output texture
         Ray ray = Ray(vec3(0), lowerLeftCorner + u * horizontal + v * vertical);
