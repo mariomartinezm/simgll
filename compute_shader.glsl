@@ -127,29 +127,36 @@ void main()
 
     for(int j = 0; j < NUM_SAMPLES; j++)
     {
+        // Randomly create coordinates for the sample
         float u = float(pixelCoords.x + float(rand_pcg(seed)) / INT_MAX) / (dims.x - 1);
         float v = float(pixelCoords.y + float(rand_pcg(seed)) / INT_MAX) / (dims.y - 1);
 
-        // Create a ray to each pixel of the output texture
+        // Create a ray to sample of the output texture
         Ray ray = Ray(vec3(0), lowerLeftCorner + u * horizontal + v * vertical);
         int hitIndex = worldHit(spheres, ray);
 
+        // Initialize the reflection factor
         vec3 reflection = vec3(1.0);
 
         while(hitIndex >= 0)
         {
+            // This is a hit so we decrease reflection
+            reflection *= 0.5;
+
             // Calculate the hit point's position and normal
             float t     = spheres[hitIndex].t;
             vec3 p      = pointAtParameter(ray, t);
             vec3 normal = normalize(p - spheres[hitIndex].center);
-            reflection *= 0.5;
 
+            // Calculate position of reflection target and send a ray to this position
             vec3 target = p + normal + randomUnitVector(seed);
-
             ray = Ray(p, target - p);
+
+            // Did we hit anything?
             hitIndex = worldHit(spheres, ray);
         }
 
+        // Add contribution for this sample
         pixel += vec4((1.0 / NUM_SAMPLES) * reflection * getColor(ray), 1.0);
     }
 
