@@ -76,7 +76,8 @@ float sphereHit(Sphere sphere, Ray ray, float tmin, float tmax)
 
 int worldHit(inout Sphere spheres[NUM_SPHERES], Ray ray)
 {
-    float tmin = 0.0;
+    // Some of the rays do not hit at exactly 0, so we compensate
+    float tmin = 0.001;
     float tmax = FLT_MAX;
 
     int hitIndex = -1;
