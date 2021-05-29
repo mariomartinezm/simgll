@@ -1,9 +1,10 @@
 #version 450 core
 
-const float FLT_MAX     = 3.402823466e+38;
-const float INT_MAX     = 4294967296.0;
-const int   NUM_SPHERES = 2;
-const int   NUM_SAMPLES = 100;
+const float FLT_MAX        = 3.402823466e+38;
+const float INT_MAX        = 4294967296.0;
+const float MIN_REFLECTION = 0.125;
+const int   NUM_SPHERES    = 2;
+const int   NUM_SAMPLES    = 100;
 
 layout(local_size_x = 32, local_size_y = 32) in;
 layout(binding = 0, rgba32f) uniform image2D imgOutput;
@@ -154,6 +155,12 @@ void main()
 
             // Did we hit anything?
             hitIndex = worldHit(spheres, ray);
+
+            // If reflection is too small just break
+            if(reflection.x < MIN_REFLECTION)
+            {
+                break;
+            }
         }
 
         // Add contribution for this sample
