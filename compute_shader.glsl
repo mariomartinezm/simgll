@@ -194,7 +194,8 @@ void main()
             // Did we hit anything?
             hitIndex = worldHit(spheres, ray);
 
-            // If reflection is too small just break
+            // If reflection is too small or if there is no scattering just
+            // break
             if(reflection.x < MIN_REFLECTION || (!s))
             {
                 break;
@@ -202,7 +203,7 @@ void main()
         }
 
         // Add contribution for this sample
-        pixel += vec4((1.0 / NUM_SAMPLES) * reflection * getColor(ray), 1.0);
+        pixel += vec4((1.0 / NUM_SAMPLES) * sqrt(reflection * getColor(ray)), 1.0);
     }
 
     imageStore(imgOutput, pixelCoords, pixel);
