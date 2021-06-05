@@ -3,8 +3,12 @@
 const float FLT_MAX        = 3.402823466e+38;
 const float INT_MAX        = 4294967296.0;
 const float MIN_REFLECTION = 0.125;
-const int   NUM_SPHERES    = 2;
+const int   NUM_SPHERES    = 4;
 const int   NUM_SAMPLES    = 100;
+
+// Materials
+const uint LAMBERTIAN = 0;
+const uint METAL      = 1;
 
 layout(local_size_x = 32, local_size_y = 32) in;
 layout(binding = 0, rgba32f) uniform image2D imgOutput;
@@ -19,9 +23,18 @@ struct Ray
 
 struct Sphere
 {
-    vec3 center;
+    vec3  center;
     float radius;
     float t;
+    vec3  albedo;
+    uint  material;
+};
+
+struct Hit
+{
+    float t;
+    vec3  p;
+    vec3  normal;
 };
 
 uint rand_pcg(inout uint rng_state)
@@ -107,6 +120,28 @@ vec3 getColor(Ray ray)
     return (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
 }
 
+bool scatter(Hit hit, uint seed, uint material, inout Ray scattered)
+{
+    switch(material)
+    {
+        case LAMBERTIAN:
+            vec3 target = hit.p + hit.normal + randomUnitVector(seed);
+            scattered = Ray(hit.p, target - hit.p);
+            return true;
+            break;
+
+        case METAL:
+            vec3 reflected = reflect(normalize(scattered.direction), hit.normal);
+            scattered = Ray(hit.p, reflected);
+            return (dot(scattered.direction, hit.normal) > 0);
+            break;
+
+        default:
+            return true;
+            break;
+    }
+}
+
 void main()
 {
     ivec2 dims = imageSize(imgOutput);
@@ -117,12 +152,14 @@ void main()
 
     // camera settings
     vec3 lowerLeftCorner = vec3(-2.0, -2.0, -1.0);
-    vec3 horizontal      = vec3(4.0, 0.0, 0.0);
-    vec3 vertical        = vec3(0.0, 4.0, 0.0);
+    vec3 horizontal      = vec3( 4.0,  0.0,  0.0);
+    vec3 vertical        = vec3( 0.0,  4.0,  0.0);
 
-    Sphere spheres[2];
-    spheres[0] = Sphere(vec3(0.0, 0.0, -5.0), 2.5, -1.0);
-    spheres[1] = Sphere(vec3(0.0, -502.5, -5.0), 500, -1.0);
+    Sphere spheres[NUM_SPHERES];
+    spheres[0] = Sphere(vec3( 0.0,    0.0, -5.0), 2.5, -1.0, vec3(0.8, 0.3, 0.3), LAMBERTIAN);
+    spheres[1] = Sphere(vec3( 0.0, -502.5, -5.0), 500, -1.0, vec3(0.3, 0.3, 0.0), LAMBERTIAN);
+    spheres[2] = Sphere(vec3(-4.5,    0.0, -5.0), 2.5, -1.0, vec3(0.8, 0.8, 0.8), METAL);
+    spheres[3] = Sphere(vec3( 4.5,    0.0, -5.0), 2.5, -1.0, vec3(0.8, 0.6, 0.2), METAL);
 
     // Initialize color of the hitpoint
     vec4 pixel = vec4(vec3(0.0), 1.0);
@@ -143,22 +180,22 @@ void main()
         while(hitIndex >= 0)
         {
             // This is a hit so we decrease reflection
-            reflection *= 0.5;
+            reflection *= spheres[hitIndex].albedo;
 
             // Calculate the hit point's position and normal
-            float t     = spheres[hitIndex].t;
-            vec3 p      = pointAtParameter(ray, t);
-            vec3 normal = normalize(p - spheres[hitIndex].center);
+            Hit hit;
+            hit.t      = spheres[hitIndex].t;
+            hit.p      = pointAtParameter(ray, hit.t);
+            hit.normal = normalize(hit.p - spheres[hitIndex].center);
 
-            // Calculate position of reflection target and send a ray to this position
-            vec3 target = p + normal + randomUnitVector(seed);
-            ray = Ray(p, target - p);
+            // Calculate scattering and send a ray along this direction
+            bool s = scatter(hit, seed, spheres[hitIndex].material, ray);
 
             // Did we hit anything?
             hitIndex = worldHit(spheres, ray);
 
             // If reflection is too small just break
-            if(reflection.x < MIN_REFLECTION)
+            if(reflection.x < MIN_REFLECTION || (!s))
             {
                 break;
             }
