@@ -3,6 +3,7 @@
 const float FLT_MAX        = 3.402823466e+38;
 const float INT_MAX        = 4294967296.0;
 const float MIN_REFLECTION = 0.125;
+const float FUZZ_FACTOR    = 0;
 const int   NUM_SPHERES    = 4;
 const int   NUM_SAMPLES    = 100;
 
@@ -132,7 +133,8 @@ bool scatter(Hit hit, uint seed, uint material, inout Ray scattered)
 
         case METAL:
             vec3 reflected = reflect(normalize(scattered.direction), hit.normal);
-            scattered = Ray(hit.p, reflected);
+            float fuziness = FUZZ_FACTOR < 1 ? FUZZ_FACTOR : 1.0;
+            scattered = Ray(hit.p, reflected + fuziness * randomUnitVector(seed));
             return (dot(scattered.direction, hit.normal) > 0);
             break;
 
