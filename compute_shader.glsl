@@ -1,15 +1,17 @@
 #version 450 core
 
-const float FLT_MAX        = 3.402823466e+38;
-const float INT_MAX        = 4294967296.0;
-const float MIN_REFLECTION = 0.125;
-const float FUZZ_FACTOR    = 0;
-const int   NUM_SPHERES    = 4;
-const int   NUM_SAMPLES    = 100;
+const float FLT_MAX          = 3.402823466e+38;
+const float INT_MAX          = 4294967296.0;
+const float MIN_REFLECTION   = 0.125;
+const float FUZZ_FACTOR      = 0;
+const float REFRACTION_INDEX = 1.5;
+const int   NUM_SPHERES      = 4;
+const int   NUM_SAMPLES      = 100;
 
 // Materials
 const uint LAMBERTIAN = 0;
 const uint METAL      = 1;
+const uint DIELECTRIC = 2;
 
 layout(local_size_x = 32, local_size_y = 32) in;
 layout(binding = 0, rgba32f) uniform image2D imgOutput;
@@ -121,6 +123,23 @@ vec3 getColor(Ray ray)
     return (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
 }
 
+bool refractRay(vec3 v, vec3 n, float niOverNt, inout vec3 refracted)
+{
+    vec3 uv = normalize(v);
+    float dt = dot(uv, n);
+
+    float discriminant = 1.0 - niOverNt * niOverNt * (1 - dt * dt);
+
+    if(discriminant > 0)
+    {
+        refracted = niOverNt * (uv - n * dt) - n * sqrt(discriminant);
+
+        return true;
+    }
+
+    return false;
+}
+
 bool scatter(Hit hit, uint seed, uint material, inout Ray scattered)
 {
     switch(material)
@@ -136,6 +155,37 @@ bool scatter(Hit hit, uint seed, uint material, inout Ray scattered)
             float fuziness = FUZZ_FACTOR < 1 ? FUZZ_FACTOR : 1.0;
             scattered = Ray(hit.p, reflected + fuziness * randomUnitVector(seed));
             return (dot(scattered.direction, hit.normal) > 0);
+            break;
+
+        case DIELECTRIC:
+            vec3 outwardNormal;
+            reflected = reflect(normalize(scattered.direction), hit.normal);
+            float niOverNt;
+            vec3 attenuation = vec3(1.0, 1.0, 1.0);
+
+            vec3 refracted;
+            if(dot(scattered.direction, hit.normal) > 0)
+            {
+                outwardNormal = -hit.normal;
+                niOverNt = REFRACTION_INDEX;
+            }
+            else
+            {
+                outwardNormal = hit.normal;
+                niOverNt = 1.0 / REFRACTION_INDEX;
+            }
+
+            if(refractRay(scattered.direction, outwardNormal, niOverNt, refracted))
+            {
+                scattered = Ray(hit.p, refracted);
+            }
+            else
+            {
+                scattered = Ray(hit.p, reflected);
+                return false;
+            }
+
+            return true;
             break;
 
         default:
@@ -160,7 +210,7 @@ void main()
     Sphere spheres[NUM_SPHERES];
     spheres[0] = Sphere(vec3( 0.0,    0.0, -5.0), 2.5, -1.0, vec3(0.8, 0.3, 0.3), LAMBERTIAN);
     spheres[1] = Sphere(vec3( 0.0, -502.5, -5.0), 500, -1.0, vec3(0.3, 0.3, 0.0), LAMBERTIAN);
-    spheres[2] = Sphere(vec3(-4.5,    0.0, -5.0), 2.5, -1.0, vec3(0.8, 0.8, 0.8), METAL);
+    spheres[2] = Sphere(vec3(-4.5,    0.0, -5.0), 2.5, -1.0, vec3(1.0, 1.0, 1.0), DIELECTRIC);
     spheres[3] = Sphere(vec3( 4.5,    0.0, -5.0), 2.5, -1.0, vec3(0.8, 0.6, 0.2), METAL);
 
     // Initialize color of the hitpoint
