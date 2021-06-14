@@ -5,7 +5,7 @@ const float INT_MAX          = 4294967296.0;
 const float MIN_REFLECTION   = 0.125;
 const float FUZZ_FACTOR      = 0;
 const float REFRACTION_INDEX = 1.5;
-const int   NUM_SPHERES      = 4;
+const int   NUM_SPHERES      = 5;
 const int   NUM_SAMPLES      = 100;
 
 // Materials
@@ -123,21 +123,14 @@ vec3 getColor(Ray ray)
     return (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
 }
 
-bool refractRay(vec3 v, vec3 n, float niOverNt, inout vec3 refracted)
+// Schlick's approximation for reflectance
+float reflectance(float cosine, float refractionIndex)
 {
-    vec3 uv = normalize(v);
-    float dt = dot(uv, n);
+    float r0 = (1 - refractionIndex) / (1 + refractionIndex);
 
-    float discriminant = 1.0 - niOverNt * niOverNt * (1 - dt * dt);
+    r0 *= r0;
 
-    if(discriminant > 0)
-    {
-        refracted = niOverNt * (uv - n * dt) - n * sqrt(discriminant);
-
-        return true;
-    }
-
-    return false;
+    return r0 + (1 - r0) * pow(1 - cosine, 5);
 }
 
 bool scatter(Hit hit, uint seed, uint material, inout Ray scattered)
@@ -159,31 +152,41 @@ bool scatter(Hit hit, uint seed, uint material, inout Ray scattered)
 
         case DIELECTRIC:
             vec3 outwardNormal;
-            reflected = reflect(normalize(scattered.direction), hit.normal);
             float niOverNt;
-            vec3 attenuation = vec3(1.0, 1.0, 1.0);
 
-            vec3 refracted;
+            // Determine which side of the sphere the ray is on
             if(dot(scattered.direction, hit.normal) > 0)
             {
+                // Ray is inside the sphere
                 outwardNormal = -hit.normal;
-                niOverNt = REFRACTION_INDEX;
+                niOverNt      = REFRACTION_INDEX;
             }
             else
             {
+                // Rays is outside the sphere
                 outwardNormal = hit.normal;
-                niOverNt = 1.0 / REFRACTION_INDEX;
+                niOverNt      = 1.0 / REFRACTION_INDEX;
             }
 
-            if(refractRay(scattered.direction, outwardNormal, niOverNt, refracted))
+            vec3 unitDirection = normalize(scattered.direction);
+
+            float cosTheta = min(dot(-unitDirection, outwardNormal), 1.0);
+            float sinTheta = sqrt(1.0 - cosTheta * cosTheta);
+
+            bool cannotRefract = (niOverNt * sinTheta) > 1.0;
+
+            vec3 direction;
+            if(cannotRefract ||
+               reflectance(cosTheta, REFRACTION_INDEX) > float(rand_pcg(seed)) / INT_MAX)
             {
-                scattered = Ray(hit.p, refracted);
+                direction = reflect(unitDirection, hit.normal);
             }
             else
             {
-                scattered = Ray(hit.p, reflected);
-                return false;
+                direction = refract(unitDirection, outwardNormal, niOverNt);
             }
+
+            scattered = Ray(hit.p, direction);
 
             return true;
             break;
@@ -211,7 +214,8 @@ void main()
     spheres[0] = Sphere(vec3( 0.0,    0.0, -5.0), 2.5, -1.0, vec3(0.8, 0.3, 0.3), LAMBERTIAN);
     spheres[1] = Sphere(vec3( 0.0, -502.5, -5.0), 500, -1.0, vec3(0.3, 0.3, 0.0), LAMBERTIAN);
     spheres[2] = Sphere(vec3(-4.5,    0.0, -5.0), 2.5, -1.0, vec3(1.0, 1.0, 1.0), DIELECTRIC);
-    spheres[3] = Sphere(vec3( 4.5,    0.0, -5.0), 2.5, -1.0, vec3(0.8, 0.6, 0.2), METAL);
+    spheres[3] = Sphere(vec3(-4.5,    0.0, -5.0),-2.4, -1.0, vec3(1.0, 1.0, 1.0), DIELECTRIC);
+    spheres[4] = Sphere(vec3( 4.5,    0.0, -5.0), 2.5, -1.0, vec3(0.8, 0.6, 0.2), METAL);
 
     // Initialize color of the hitpoint
     vec4 pixel = vec4(vec3(0.0), 1.0);
