@@ -2,7 +2,7 @@
 
 const float FLT_MAX          = 3.402823466e+38;
 const float INT_MAX          = 4294967296.0;
-const float MIN_REFLECTION   = 0.125;
+const float MIN_REFLECTION   = 0.01;
 const float FUZZ_FACTOR      = 0;
 const float REFRACTION_INDEX = 1.5;
 const int   NUM_SPHERES      = 5;
@@ -266,7 +266,7 @@ void main()
 
             // If reflection is too small or if there is no scattering just
             // break
-            if(reflection.x < MIN_REFLECTION || (!s))
+            if(length(reflection) < MIN_REFLECTION || (!s))
             {
                 break;
             }
