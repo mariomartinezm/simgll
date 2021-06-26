@@ -123,6 +123,13 @@ vec3 getColor(Ray ray)
     return (1.0 - t) * vec3(1.0, 1.0, 1.0) + t * vec3(0.5, 0.7, 1.0);
 }
 
+bool nearZero(vec3 v)
+{
+    // Return true if the vector is close to zero in all dimensions
+    const float s = 1e-8;
+    return (abs(v.x) < s) && (abs(v.y) < s) && (abs(v.z) < s);
+}
+
 // Schlick's approximation for reflectance
 float reflectance(float cosine, float refractionIndex)
 {
@@ -138,8 +145,15 @@ bool scatter(Hit hit, uint seed, uint material, inout Ray scattered)
     switch(material)
     {
         case LAMBERTIAN:
-            vec3 target = hit.p + hit.normal + randomUnitVector(seed);
-            scattered = Ray(hit.p, target - hit.p);
+            vec3 scatterDirection = hit.normal + randomUnitVector(seed);
+
+            // Catch degerate scatter direction
+            if(nearZero(scatterDirection))
+            {
+                scatterDirection = hit.normal;
+            }
+
+            scattered = Ray(hit.p, scatterDirection);
             return true;
             break;
 
