@@ -2,11 +2,11 @@
 
 const float FLT_MAX          = 3.402823466e+38;
 const float INT_MAX          = 4294967296.0;
-const float MIN_REFLECTION   = 0.01;
 const float FUZZ_FACTOR      = 0;
 const float REFRACTION_INDEX = 1.5;
 const int   NUM_SPHERES      = 5;
 const int   NUM_SAMPLES      = 100;
+const int   MAX_DEPTH        = 50;
 
 // Materials
 const uint LAMBERTIAN = 0;
@@ -244,8 +244,9 @@ void main()
         Ray ray = Ray(vec3(0), lowerLeftCorner + u * horizontal + v * vertical);
         int hitIndex = worldHit(spheres, ray);
 
-        // Initialize the reflection factor
+        // Initialize depth and the reflection factor
         vec3 reflection = vec3(1.0);
+        int depth       = 0;
 
         while(hitIndex >= 0)
         {
@@ -264,12 +265,14 @@ void main()
             // Did we hit anything?
             hitIndex = worldHit(spheres, ray);
 
-            // If reflection is too small or if there is no scattering just
+            // If we reach maximum depth or if there is no scattering just
             // break
-            if(length(reflection) < MIN_REFLECTION || (!s))
+            if(depth > MAX_DEPTH || !s)
             {
                 break;
             }
+
+            depth++;
         }
 
         // Add contribution for this sample

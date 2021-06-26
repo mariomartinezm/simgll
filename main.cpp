@@ -6,10 +6,10 @@
 
 #include "shaderprogram.h"
 
-constexpr GLuint WIDTH          = 1024;
-constexpr GLuint HEIGHT         = 1024;
-constexpr GLuint TEXTURE_WIDTH  = 1024;
-constexpr GLuint TEXTURE_HEIGHT = 1024;
+constexpr GLuint WIDTH          = 512;
+constexpr GLuint HEIGHT         = 512;
+constexpr GLuint TEXTURE_WIDTH  = 512;
+constexpr GLuint TEXTURE_HEIGHT = 512;
 
 GLvoid error_callback(GLint error, const GLchar* description);
 GLvoid createQuad(GLuint& vao, GLuint& vbo, GLuint& ebo);
