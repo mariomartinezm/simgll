@@ -225,8 +225,8 @@ void main()
     vec3 vertical        = vec3( 0.0,  4.0,  0.0);
 
     Sphere spheres[NUM_SPHERES];
-    spheres[0] = Sphere(vec3( 0.0,    0.0, -5.0), 2.5, -1.0, vec3(0.8, 0.3, 0.3), LAMBERTIAN);
-    spheres[1] = Sphere(vec3( 0.0, -502.5, -5.0), 500, -1.0, vec3(0.3, 0.3, 0.0), LAMBERTIAN);
+    spheres[0] = Sphere(vec3( 0.0, -502.5, -5.0), 500, -1.0, vec3(0.3, 0.3, 0.0), LAMBERTIAN);
+    spheres[1] = Sphere(vec3( 0.0,    0.0, -5.0), 2.5, -1.0, vec3(0.1, 0.2, 0.5), LAMBERTIAN);
     spheres[2] = Sphere(vec3(-4.5,    0.0, -5.0), 2.5, -1.0, vec3(1.0, 1.0, 1.0), DIELECTRIC);
     spheres[3] = Sphere(vec3(-4.5,    0.0, -5.0),-2.4, -1.0, vec3(1.0, 1.0, 1.0), DIELECTRIC);
     spheres[4] = Sphere(vec3( 4.5,    0.0, -5.0), 2.5, -1.0, vec3(0.8, 0.6, 0.2), METAL);
