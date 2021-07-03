@@ -220,9 +220,9 @@ void main()
     uint seed = (dims.x * gl_GlobalInvocationID.y + gl_GlobalInvocationID.x) * cpuSeed;
 
     // camera settings
-    vec3 lowerLeftCorner = vec3(-2.0, -2.0, -1.0);
+    vec3 lowerLeftCorner = vec3(-2.0, -1.0, -1.0);
     vec3 horizontal      = vec3( 4.0,  0.0,  0.0);
-    vec3 vertical        = vec3( 0.0,  4.0,  0.0);
+    vec3 vertical        = vec3( 0.0,  2.0,  0.0);
 
     Sphere spheres[NUM_SPHERES];
     spheres[0] = Sphere(vec3( 0.0, -502.5, -5.0), 500, -1.0, vec3(0.3, 0.3, 0.0), LAMBERTIAN);
