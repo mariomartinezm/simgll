@@ -111,7 +111,7 @@ int worldHit(inout Sphere spheres[NUM_SPHERES], Ray ray)
     return hitIndex;
 }
 
-vec3 pointAtParameter(Ray ray, float t)
+vec3 pointAt(Ray ray, float t)
 {
     return ray.origin + t * ray.direction;
 }
@@ -256,7 +256,7 @@ void main()
             // Calculate the hit point's position and normal
             Hit hit;
             hit.t      = spheres[hitIndex].t;
-            hit.p      = pointAtParameter(ray, hit.t);
+            hit.p      = pointAt(ray, hit.t);
             hit.normal = normalize(hit.p - spheres[hitIndex].center);
 
             // Calculate scattering and send a ray along this direction
