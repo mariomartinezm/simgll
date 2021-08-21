@@ -24,6 +24,15 @@ struct Ray
     vec3 direction;
 };
 
+struct Camera
+{
+    vec3  position;
+    vec3  lookat;
+    vec3  up;
+    float fov;
+    float aspectRatio;
+};
+
 struct Sphere
 {
     vec3  center;
@@ -220,9 +229,23 @@ void main()
     uint seed = (dims.x * gl_GlobalInvocationID.y + gl_GlobalInvocationID.x) * cpuSeed;
 
     // camera settings
-    vec3 lowerLeftCorner = vec3(-2.0, -1.0, -1.0);
-    vec3 horizontal      = vec3( 4.0,  0.0,  0.0);
-    vec3 vertical        = vec3( 0.0,  2.0,  0.0);
+    Camera camera = Camera(vec3(0.0,  0.0, 1.0), // position
+                           vec3(0, 0, -1),       // lookat
+                           vec3(0, 1, 0),        // up
+                           90, 16.0 / 9.0);      // field of view and aspect ratio
+
+    float theta = radians(camera.fov);
+    float h = tan(theta / 2.0);
+    float vHeight = 2.0 * h;
+    float vWidth  = camera.aspectRatio * vHeight;
+
+    vec3 w = normalize(camera.position - camera.lookat);
+    vec3 u = normalize(cross(camera.up, w));
+    vec3 v = cross(w, u);
+
+    vec3 horizontal      = vWidth  * u;
+    vec3 vertical        = vHeight * v;
+    vec3 lowerLeftCorner = camera.position - horizontal / 2.0 - vertical / 2.0 - w;
 
     Sphere spheres[NUM_SPHERES];
     spheres[0] = Sphere(vec3( 0.0, -502.5, -5.0), 500, -1.0, vec3(0.3, 0.3, 0.0), LAMBERTIAN);
@@ -241,7 +264,7 @@ void main()
         float v = float(pixelCoords.y + float(rand_pcg(seed)) / INT_MAX) / (dims.y - 1);
 
         // Create a ray to sample of the output texture
-        Ray ray = Ray(vec3(0), lowerLeftCorner + u * horizontal + v * vertical);
+        Ray ray = Ray(camera.position, lowerLeftCorner + u * horizontal + v * vertical - camera.position);
         int hitIndex = worldHit(spheres, ray);
 
         // Initialize depth and the reflection factor
