@@ -69,6 +69,22 @@ vec3 randomUnitVector(inout uint rng_state)
     return p;
 }
 
+void setupCamera(Camera camera, out vec3 lowerLeftCorner, out vec3 horizontal, out vec3 vertical)
+{
+    float theta = radians(camera.fov);
+    float h = tan(theta / 2.0);
+    float vHeight = 2.0 * h;
+    float vWidth  = camera.aspectRatio * vHeight;
+
+    vec3 w = normalize(camera.position - camera.lookat);
+    vec3 u = normalize(cross(camera.up, w));
+    vec3 v = cross(w, u);
+
+    horizontal      = vWidth  * u;
+    vertical        = vHeight * v;
+    lowerLeftCorner = camera.position - horizontal / 2.0 - vertical / 2.0 - w;
+}
+
 float sphereHit(Sphere sphere, Ray ray, float tmin, float tmax)
 {
     vec3 oc = ray.origin - sphere.center;
@@ -234,18 +250,8 @@ void main()
                            vec3(0, 1, 0),        // up
                            90, 16.0 / 9.0);      // field of view and aspect ratio
 
-    float theta = radians(camera.fov);
-    float h = tan(theta / 2.0);
-    float vHeight = 2.0 * h;
-    float vWidth  = camera.aspectRatio * vHeight;
-
-    vec3 w = normalize(camera.position - camera.lookat);
-    vec3 u = normalize(cross(camera.up, w));
-    vec3 v = cross(w, u);
-
-    vec3 horizontal      = vWidth  * u;
-    vec3 vertical        = vHeight * v;
-    vec3 lowerLeftCorner = camera.position - horizontal / 2.0 - vertical / 2.0 - w;
+    vec3 lowerLeftCorner, horizontal, vertical;
+    setupCamera(camera, lowerLeftCorner, horizontal, vertical);
 
     Sphere spheres[NUM_SPHERES];
     spheres[0] = Sphere(vec3( 0.0, -502.5, -5.0), 500, -1.0, vec3(0.3, 0.3, 0.0), LAMBERTIAN);
