@@ -3,17 +3,21 @@
 #include <algorithm>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/vec3.hpp>
 
 #include "shaderprogram.h"
+#include "camera.h"
 
-constexpr GLuint WIDTH          = 1024;
+constexpr GLuint WIDTH          = 512;
 constexpr GLuint HEIGHT         = 512;
-constexpr GLuint TEXTURE_WIDTH  = 1024;
+constexpr GLuint TEXTURE_WIDTH  = 512;
 constexpr GLuint TEXTURE_HEIGHT = 512;
 
 GLvoid error_callback(GLint error, const GLchar* description);
 GLvoid createQuad(GLuint& vao, GLuint& vbo, GLuint& ebo);
 GLuint createTextureObject(GLuint width, GLuint height);
+
+void poll_keyboard(GLFWwindow* window);
 
 int main()
 {
@@ -39,6 +43,8 @@ int main()
     }
 
     glfwMakeContextCurrent(window);
+    glfwSetCursorPosCallback(window, cursor_pos_callback);
+    glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glewExperimental = GL_TRUE;
     GLenum status = glewInit();
@@ -52,11 +58,20 @@ int main()
         exit(1);
     }
 
+    Camera camera;
+    camera.position = { 0.0f, 0.0f,  3.0f };
+    camera.target   = { 0.0f, 0.0f, -1.0f };
+    camera.up       = { 0.0f, 1.0f,  0.0f };
+
+    glfwSetWindowUserPointer(window, (GLvoid*)&camera);
+
     ShaderProgram computeProgram;
     computeProgram.addShader("compute_shader.glsl", GL_COMPUTE_SHADER);
     computeProgram.compile();
 
-    GLint cpuSeedLocation = glGetUniformLocation(computeProgram.name(), "cpuSeed");
+    GLint cpuSeedLocation      = glGetUniformLocation(computeProgram.name(), "cpuSeed");
+    GLint cameraPosLocation    = glGetUniformLocation(computeProgram.name(), "cameraPos");
+    GLint cameraTargetLocation = glGetUniformLocation(computeProgram.name(), "cameraTarget");
 
     ShaderProgram renderProgram;
     renderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
@@ -73,10 +88,23 @@ int main()
     glViewport(0, 0, WIDTH, HEIGHT);
     glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
 
+    GLfloat currentTime = 0.0F;
+    GLfloat oldTime     = 0.0F;
+    GLfloat deltaTime   = 0.0F;
+
     while(!glfwWindowShouldClose(window))
     {
+        currentTime = (GLfloat) glfwGetTime();
+        deltaTime   = currentTime - oldTime;
+        oldTime     = currentTime;
+
+        auto newTarget = camera.position + camera.target;
+
         glUseProgram(computeProgram.name());
+
         glUniform1ui(cpuSeedLocation, rand());
+        glUniform3f(cameraPosLocation, camera.position.x, camera.position.y, camera.position.z);
+        glUniform3f(cameraTargetLocation, newTarget.x, newTarget.y, newTarget.z);
 
         glBindImageTexture(0, texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
@@ -85,6 +113,7 @@ int main()
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
         glfwPollEvents();
+        poll_keyboard(window, deltaTime);
 
         glClear(GL_COLOR_BUFFER_BIT);
 

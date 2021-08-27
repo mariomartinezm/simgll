@@ -17,6 +17,8 @@ layout(local_size_x = 32, local_size_y = 32) in;
 layout(binding = 0, rgba32f) uniform image2D imgOutput;
 
 uniform uint cpuSeed;
+uniform vec3 cameraPos;
+uniform vec3 cameraTarget;
 
 struct Ray
 {
@@ -245,10 +247,8 @@ void main()
     uint seed = (dims.x * gl_GlobalInvocationID.y + gl_GlobalInvocationID.x) * cpuSeed;
 
     // camera settings
-    Camera camera = Camera(vec3(0.0,  0.0, 1.0), // position
-                           vec3(0, 0, -1),       // lookat
-                           vec3(0, 1, 0),        // up
-                           90, 16.0 / 9.0);      // field of view and aspect ratio
+    Camera camera = Camera(cameraPos, cameraTarget, vec3(0, 1, 0), 90,
+                           float(dims.x) / dims.y);
 
     vec3 lowerLeftCorner, horizontal, vertical;
     setupCamera(camera, lowerLeftCorner, horizontal, vertical);
