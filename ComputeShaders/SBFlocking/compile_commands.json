@@ -1,0 +1,36 @@
+[
+{
+    "arguments": [
+        "C:/Qt/Tools/mingw730_64/bin/g++.exe",
+        "-c",
+        "--target=x86_64-w64-mingw32",
+        "-m64",
+        "-g",
+        "-std=gnu++11",
+        "-ID:/Documents/C++/OpenGL/SBFlocking/.",
+        "-IC:/OpenGL/include",
+        "-x",
+        "c++",
+        "D:\\Documents\\C++\\OpenGL\\SBFlocking\\main.cpp"
+    ],
+    "directory": "D:/Documents/C++/OpenGL/SBFlocking/build-Debug",
+    "file": "D:/Documents/C++/OpenGL/SBFlocking/main.cpp"
+},
+{
+    "arguments": [
+        "C:/Qt/Tools/mingw730_64/bin/g++.exe",
+        "-c",
+        "--target=x86_64-w64-mingw32",
+        "-m64",
+        "-g",
+        "-std=gnu++11",
+        "-ID:/Documents/C++/OpenGL/SBFlocking/.",
+        "-IC:/OpenGL/include",
+        "-x",
+        "c++",
+        "D:\\Documents\\C++\\OpenGL\\SBFlocking\\shaderprogram.cpp"
+    ],
+    "directory": "D:/Documents/C++/OpenGL/SBFlocking/build-Debug",
+    "file": "D:/Documents/C++/OpenGL/SBFlocking/shaderprogram.cpp"
+}
+]
