@@ -2,9 +2,6 @@ cmake_minimum_required(VERSION 3.1)
 
 project(PSO LANGUAGES CXX)
 
-set(CMAKE_CXX_STANDARD 11)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 set(SOURCES
     main.cpp
     ../../Utils/shaderprogram.cpp)
@@ -24,13 +21,12 @@ endif(UNIX)
 
 if(WIN32)
     target_include_directories(${PROJECT_NAME}
-        PRIVATE ../../ThirdParty/include
+        PRIVATE ${CMAKE_PREFIX_PATH}/include
         PRIVATE ../../Utils)
+
     target_link_libraries(${PROJECT_NAME} opengl32)
-
-    find_library(GLEW_LIB glew32 HINTS ../../ThirdParty/lib)
+    find_library(GLEW_LIB glew32)
     target_link_libraries(${PROJECT_NAME} ${GLEW_LIB})
-
-    find_library(GLFW_LIB glfw3dll HINTS ../../ThirdParty/lib)
+    find_library(GLFW_LIB glfw3dll)
     target_link_libraries(${PROJECT_NAME} ${GLFW_LIB})
 endif(WIN32)
