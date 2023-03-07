@@ -4,13 +4,16 @@
 #include <random>
 #include <chrono>
 #include <GL/glew.h>
-#include <glfw/glfw3.h>
+#include <GLFW/glfw3.h>
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
 #include "shaderprogram.h"
 #include "camera.h"
+#include "imgui.h"
+#include "imgui_impl_glfw.h"
+#include "imgui_impl_opengl3.h"
 
 constexpr GLuint WIDTH            = 512;
 constexpr GLuint HEIGHT           = 512;
@@ -77,6 +80,18 @@ int main()
         glfwTerminate();
         exit(1);
     }
+
+    // Setup DearImGui contxt
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+
+    // Setup platform / renderer bindings
+    ImGui_ImplGlfw_InitForOpenGL(window, true);
+    ImGui_ImplOpenGL3_Init("#version 450");
+
+    // Setup Dear Imgui style
+    ImGui::StyleColorsDark();
 
     Camera camera;
     camera.position = { 0.0f, 0.0f,  3.0f };
@@ -244,9 +259,6 @@ int main()
                 bestPosition = currentBestPosition;
             }
 
-            std::cout << bestPosition.x << " " << bestPosition.y << " " << bestPosition.z << "\n";
-            std::cout << f(bestPosition) << "\n";
-
             glUnmapBuffer(GL_ARRAY_BUFFER);
 
             omega -= (0.9F - 0.4F) / NUM_ITER;
@@ -260,7 +272,21 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+        // feed inputs to dear imgui, start new frame
+        ImGui_ImplOpenGL3_NewFrame();
+        ImGui_ImplGlfw_NewFrame();
+        ImGui::NewFrame();
+
         glUseProgram(renderProgram.name());
+
+        // Render your GUI
+        ImGui::Begin("PSO");
+
+        ImGui::Text("Iteration = %d", i);
+        ImGui::Text("Omega = %f", omega);
+        ImGui::Text("Best Position = (%f, %f, %f)",
+                    bestPosition.x, bestPosition.y, bestPosition.z);
+        ImGui::Text("Best Fitness = %f", f(bestPosition));
 
         auto newTarget  = camera.position + camera.target;
         auto modelView  = glm::lookAt(camera.position, newTarget, camera.up);
@@ -272,6 +298,12 @@ int main()
 
         glBindVertexArray(renderVaos[frameIndex]);
         glDrawArraysInstanced(GL_POINTS, 0, 1, SWARM_SIZE);
+
+        ImGui::End();
+
+        // Render dear imgui into screen
+        ImGui::Render();
+        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
         glfwSwapBuffers(window);
     }
