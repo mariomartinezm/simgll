@@ -17,6 +17,15 @@ configure_file(fragment_shader.glsl fragment_shader.glsl COPYONLY)
 add_executable(${PROJECT_NAME} ${SOURCES})
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
 
+if(UNIX)
+    target_include_directories(${PROJECT_NAME}
+        PRIVATE ../../Utils)
+
+    target_link_libraries(${PROJECT_NAME} GL)
+    target_link_libraries(${PROJECT_NAME} GLEW)
+    target_link_libraries(${PROJECT_NAME} glfw)
+endif(UNIX)
+
 if(WIN32)
     target_include_directories(${PROJECT_NAME}
         PRIVATE ${CMAKE_PREFIX_PATH}/include
