@@ -1,11 +1,12 @@
-#ifndef INPUT_H
-#define INPUT_H
+#pragma once
 
 #include <GLFW/glfw3.h>
 #include <glm/vec3.hpp>
 #include <glm/vec4.hpp>
 #include <glm/mat3x3.hpp>
 #include <glm/gtx/transform.hpp>
+
+#include "glm3_export.h"
 
 struct Camera
 {
@@ -99,6 +100,3 @@ void cursor_pos_callback(GLFWwindow* window, double xPos, double yPos)
     newTarget = rotation * glm::vec4(camera->target.x, camera->target.y, camera->target.z, 0.0f);
     camera->target = newTarget;
 }
-
-
-#endif // INPUT_H

@@ -1,9 +1,8 @@
-#ifndef TEXTURE_H
-#define TEXTURE_H
+#pragma once
 
 #include <GL/glew.h>
 #include <FreeImage.h>
 
-GLuint createTextureObject(const char* filename);
+#include "glm3_export.h"
 
-#endif // TEXTURE_H
+GLM3_EXPORT GLuint createTextureObject(const char* filename);

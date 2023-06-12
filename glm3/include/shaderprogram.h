@@ -1,11 +1,12 @@
-#ifndef SHADERPROGRAM_H
-#define SHADERPROGRAM_H
+#pragma once
 
 #include <iostream>
 #include <vector>
 #include <GL/glew.h>
 
-class ShaderProgram
+#include "glm3_export.h"
+
+class GLM3_EXPORT ShaderProgram
 {
 public:
     ShaderProgram();
@@ -20,5 +21,3 @@ private:
     GLuint mName;
     std::vector<GLuint> mShaderObjects;
 };
-
-#endif // SHADERPROGRAM_H
