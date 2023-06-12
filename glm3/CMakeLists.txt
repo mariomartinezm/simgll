@@ -2,6 +2,9 @@ cmake_minimum_required(VERSION 3.15)
 
 project(glm3)
 
+set(CMAKE_CXX_VISIBILITY_PRESET     hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
+
 set(SOURCES
     include/camera.h
     include/shaderprogram.h
@@ -9,11 +12,19 @@ set(SOURCES
     src/texture.cpp
     src/shaderprogram.cpp)
 
+# The preferred practice is not to specify the type of library to be built and
+# leave the choice to the user
 add_library(${PROJECT_NAME} ${SOURCES})
 
+include(GenerateExportHeader)
+generate_export_header(${PROJECT_NAME})
+
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
+
+# Add the library's binary directory so other targets find the export file
 target_include_directories(${PROJECT_NAME}
     PUBLIC include
+    PUBLIC ${CMAKE_CURRENT_BINARY_DIR}
     PRIVATE src)
 
 if(UNIX)
