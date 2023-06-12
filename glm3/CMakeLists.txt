@@ -1,5 +1,3 @@
-cmake_minimum_required(VERSION 3.25)
-
 project(glm3)
 
 set(CMAKE_CXX_VISIBILITY_PRESET     hidden)
