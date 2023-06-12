@@ -3,8 +3,11 @@ cmake_minimum_required(VERSION 3.15)
 project(glm3)
 
 set(SOURCES
-    ./src/texture.cpp
-    ./src/shaderprogram.cpp)
+    include/camera.h
+    include/shaderprogram.h
+    include/texture.h
+    src/texture.cpp
+    src/shaderprogram.cpp)
 
 add_library(${PROJECT_NAME} ${SOURCES})
 
