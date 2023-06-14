@@ -21,3 +21,5 @@ add_subdirectory(ComputeShaders/TextureReadAndWrite)
 
 add_subdirectory(DearImGui/Test)
 add_subdirectory(DearImGui/PositionAndColor)
+
+add_subdirectory(Misc/wxGLCanvas)
