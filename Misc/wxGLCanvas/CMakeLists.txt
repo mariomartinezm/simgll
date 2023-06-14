@@ -1,9 +1,4 @@
-cmake_minimum_required(VERSION 3.25)
-
 project(wxGLCanvas LANGUAGES CXX)
-
-set(CMAKE_CXX_STANDARD 14)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 if(WIN32)
     set(wxWidgets_ROOT_DIR $ENV{WX_ROOT_DIR})
