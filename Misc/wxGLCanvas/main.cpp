@@ -1,15 +1,16 @@
-#include "trianglewindow.h"
+#include <wx/wx.h>
+#include "glframe.h"
 
 class MyApp : public wxApp
 {
 public:
-    bool OnInit() override;
+    virtual bool OnInit();
 };
 
 bool MyApp::OnInit()
 {
-    TriangleWindow* window = new TriangleWindow(nullptr, "Hello OpenGL");
-    window->Show();
+    GLFrame* frame = new GLFrame(nullptr);
+    frame->Show();
 
     return true;
 }

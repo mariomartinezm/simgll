@@ -11,10 +11,13 @@ include(${wxWidgets_USE_FILE})
 add_executable(${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PRIVATE
     main.cpp
-    trianglewindow.h
-    trianglewindow.cpp
-    trianglecanvas.h
-    trianglecanvas.cpp)
+    glhelper.h
+    glhelper.cpp
+    glframe.h
+    glframe.cpp)
+
+configure_file(vertex_shader.glsl vertex_shader.glsl COPYONLY)
+configure_file(fragment_shader.glsl fragment_shader.glsl COPYONLY)
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
 target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES})
@@ -25,4 +28,5 @@ if(WIN32)
 
     find_library(GLEW_LIB glew32)
     target_link_libraries(${PROJECT_NAME} ${GLEW_LIB})
+    target_link_libraries(${PROJECT_NAME} glm3)
 endif()
