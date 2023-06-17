@@ -22,6 +22,13 @@ configure_file(fragment_shader.glsl fragment_shader.glsl COPYONLY)
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
 target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES})
 
+if(UNIX)
+    target_include_directories(${PROJECT_NAME}
+        PRIVATE ${CMAKE_PREFIX_PATH}/include)
+
+    target_link_libraries(${PROJECT_NAME} glm3)
+endif()
+
 if(WIN32)
     target_include_directories(${PROJECT_NAME}
         PRIVATE ${CMAKE_PREFIX_PATH}/include)
