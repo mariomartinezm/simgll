@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 add_subdirectory(glm3)
 
+add_subdirectory(Fundamentals/HelloOpenGL)
 add_subdirectory(Fundamentals/SpecifyingVertexData)
 add_subdirectory(Fundamentals/Instancing)
 add_subdirectory(Fundamentals/Camera)
