@@ -1,10 +1,27 @@
+#ifdef __WXMSW__
+    #include <GL/wglew.h>
+#elif defined(__WXGTK__)
+    #include <GL/glxew.h>
+#endif
+
 #include "glhelper.h"
 #include "shaderprogram.h"
 
+#include <fstream>
+
 bool GLHelper::initGlew()
 {
-    glewExperimental = true;
+    glewExperimental = GL_TRUE;
     GLenum status = glewInit();
+
+    if(status != GLEW_OK)
+    {
+        std::ofstream error_stream("error.log");
+
+        error_stream << glewGetErrorString(status);
+
+        error_stream.close();
+    }
 
     return status == GLEW_OK;
 }
