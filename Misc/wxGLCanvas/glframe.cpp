@@ -10,25 +10,10 @@ GLFrame::GLFrame(wxWindow* parent)
     wxGLAttributes dispAttrs;
     dispAttrs.PlatformDefaults().RGBA().DoubleBuffer().EndList();
 
-    wxGLContextAttrs cxtAttrs;
-    cxtAttrs.PlatformDefaults().CoreProfile().OGLVersion(3, 3).EndList();
-
     mCanvas  = new wxGLCanvas(this, dispAttrs);
-    mContext = new wxGLContext(mCanvas, NULL, &cxtAttrs);
 
-    if(!mContext->IsOK())
-    {
-        SetTitle("Failed to create context");
-        return;
-    }
-
-    // On Linux, we must delay delay initialization until the canvas
-    // has been fully created. On windows, we can finish now.
-#ifdef __WXMSW__
-    initGL();
-#elif defined(__WXGTK__)
-    mCanvas->Bind(wxEVT_CREATE, [this](wxWindowCreateEvent&){ initGL(); });
-#endif
+    mCanvas->Bind(wxEVT_SIZE, &GLFrame::OnCanvasSize, this);
+    mCanvas->Bind(wxEVT_PAINT, &GLFrame::OnCanvasPaint, this);
 }
 
 GLFrame::~GLFrame()
@@ -39,6 +24,21 @@ GLFrame::~GLFrame()
 
 void GLFrame::OnCanvasSize(wxSizeEvent& event)
 {
+    // Context creation is done here since in Linux you should wait
+    // until the canvas has a positive size and IsShownOnScreen() is
+    // true
+    wxGLContextAttrs cxtAttrs;
+    cxtAttrs.PlatformDefaults().CoreProfile().OGLVersion(3, 3).EndList();
+    mContext = new wxGLContext(mCanvas, NULL, &cxtAttrs);
+
+    if(!mContext->IsOK())
+    {
+        SetTitle("Failed to create context");
+        return;
+    }
+
+    initGL();
+
     wxSize sz = event.GetSize();
     mHelper.setSize(sz.GetWidth(), sz.GetHeight());
     event.Skip();
@@ -70,9 +70,4 @@ void GLFrame::initGL()
 
     // Initialize the triangle data
     mHelper.initData();
-
-    // Bind event handlers for the canvas. Binding was delayed until OpenGL was initialized
-    // because these handlers will need to call OpenGL functions
-    mCanvas->Bind(wxEVT_SIZE, &GLFrame::OnCanvasSize, this);
-    mCanvas->Bind(wxEVT_PAINT, &GLFrame::OnCanvasPaint, this);
 }
