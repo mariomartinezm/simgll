@@ -9,15 +9,13 @@
 class GLM3_EXPORT ShaderProgram
 {
 public:
-    ShaderProgram();
+    ShaderProgram(GLuint& programName);
     ~ShaderProgram();
-
-    GLuint name();
 
     GLvoid addShader(const std::string& filename, const GLenum& shaderType);
     GLvoid compile();
 
 private:
-    GLuint mName;
+    GLuint& mProgramName;
     std::vector<GLuint> mShaderObjects;
 };
