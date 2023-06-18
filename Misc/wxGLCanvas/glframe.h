@@ -19,4 +19,5 @@ private:
     wxGLCanvas*  mCanvas;
     wxGLContext* mContext;
     GLHelper     mHelper;
+    bool mIsInitialized = { false };
 };

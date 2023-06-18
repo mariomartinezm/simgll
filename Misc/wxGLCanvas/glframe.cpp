@@ -24,24 +24,33 @@ GLFrame::~GLFrame()
 
 void GLFrame::OnCanvasSize(wxSizeEvent& event)
 {
-    // Context creation is done here since in Linux you should wait
-    // until the canvas has a positive size and IsShownOnScreen() is
-    // true
-    wxGLContextAttrs cxtAttrs;
-    cxtAttrs.PlatformDefaults().CoreProfile().OGLVersion(3, 3).EndList();
-    mContext = new wxGLContext(mCanvas, NULL, &cxtAttrs);
+    event.Skip();
 
-    if(!mContext->IsOK())
+    if (!IsShownOnScreen())
     {
-        SetTitle("Failed to create context");
         return;
     }
 
-    initGL();
+    // Context creation is done here since in Linux you should wait
+    // until the canvas has a positive size and IsShownOnScreen() is
+    // true
+    if(!mIsInitialized)
+    {
+        wxGLContextAttrs cxtAttrs;
+        cxtAttrs.PlatformDefaults().CoreProfile().OGLVersion(3, 3).EndList();
+        mContext = new wxGLContext(mCanvas, NULL, &cxtAttrs);
+
+        if(!mContext->IsOK())
+        {
+            SetTitle("Failed to create context");
+            return;
+        }
+
+        initGL();
+    }
 
     wxSize sz = event.GetSize();
     mHelper.setSize(sz.GetWidth(), sz.GetHeight());
-    event.Skip();
 }
 
 void GLFrame::OnCanvasPaint(wxPaintEvent&)
@@ -70,4 +79,6 @@ void GLFrame::initGL()
 
     // Initialize the triangle data
     mHelper.initData();
+
+    mIsInitialized = true;
 }
