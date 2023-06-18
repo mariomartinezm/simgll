@@ -1,6 +1,7 @@
 #include "glframe.h"
+
 #include <wx/event.h>
-#include <wx/msw/glcanvas.h>
+
 
 GLFrame::GLFrame(wxWindow* parent)
     : wxFrame(parent, wxID_ANY, wxString{})
@@ -10,7 +11,7 @@ GLFrame::GLFrame(wxWindow* parent)
     dispAttrs.PlatformDefaults().RGBA().DoubleBuffer().EndList();
 
     wxGLContextAttrs cxtAttrs;
-    cxtAttrs.PlatformDefaults().CoreProfile().OGLVersion(4, 5).EndList();
+    cxtAttrs.PlatformDefaults().CoreProfile().OGLVersion(3, 3).EndList();
 
     mCanvas  = new wxGLCanvas(this, dispAttrs);
     mContext = new wxGLContext(mCanvas, NULL, &cxtAttrs);
@@ -21,8 +22,13 @@ GLFrame::GLFrame(wxWindow* parent)
         return;
     }
 
+    // On Linux, we must delay delay initialization until the canvas
+    // has been fully created. On windows, we can finish now.
+#ifdef __WXMSW__
     initGL();
-    //mCanvas->Bind(wxEVT_CREATE, [this](wxWindowCreateEvent&){ initGL(); });
+#elif defined(__WXGTK__)
+    mCanvas->Bind(wxEVT_CREATE, [this](wxWindowCreateEvent&){ initGL(); });
+#endif
 }
 
 GLFrame::~GLFrame()
