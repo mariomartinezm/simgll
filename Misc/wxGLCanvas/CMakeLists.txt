@@ -20,13 +20,15 @@ configure_file(vertex_shader.glsl vertex_shader.glsl COPYONLY)
 configure_file(fragment_shader.glsl fragment_shader.glsl COPYONLY)
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
-target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES})
 
 if(UNIX)
     target_include_directories(${PROJECT_NAME}
         PRIVATE ${CMAKE_PREFIX_PATH}/include)
 
+    target_link_libraries(${PROJECT_NAME} GL)
+    target_link_libraries(${PROJECT_NAME} GLEW)
     target_link_libraries(${PROJECT_NAME} glm3)
+    target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES})
 endif()
 
 if(WIN32)
@@ -36,4 +38,5 @@ if(WIN32)
     find_library(GLEW_LIB glew32)
     target_link_libraries(${PROJECT_NAME} ${GLEW_LIB})
     target_link_libraries(${PROJECT_NAME} glm3)
+    target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES})
 endif()
