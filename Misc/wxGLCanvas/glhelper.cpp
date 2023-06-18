@@ -7,21 +7,10 @@
 #include "glhelper.h"
 #include "shaderprogram.h"
 
-#include <fstream>
-
 bool GLHelper::initGlew()
 {
     glewExperimental = GL_TRUE;
     GLenum status = glewInit();
-
-    if(status != GLEW_OK)
-    {
-        std::ofstream error_stream("error.log");
-
-        error_stream << glewGetErrorString(status);
-
-        error_stream.close();
-    }
 
     return status == GLEW_OK;
 }
