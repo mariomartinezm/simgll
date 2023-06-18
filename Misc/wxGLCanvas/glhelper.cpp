@@ -45,6 +45,8 @@ bool GLHelper::initData()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
+    glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
+
     return true;
 }
 
