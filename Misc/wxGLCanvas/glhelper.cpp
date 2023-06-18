@@ -1,3 +1,5 @@
+#include "shaderprogram.h"
+
 #ifdef __WXMSW__
     #include <GL/wglew.h>
 #elif defined(__WXGTK__)
@@ -23,12 +25,10 @@ bool GLHelper::initData()
          0.0f,  0.5f, 0.0f,
     };
 
-    ShaderProgram shaderProgram;
-    shaderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
-    shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-    shaderProgram.compile();
-    mShaderProgram = shaderProgram.name();
-    std::cout << "Shader = " << mShaderProgram << std::endl;
+    mShaderProgram = new ShaderProgram();
+    mShaderProgram->addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
+    mShaderProgram->addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
+    mShaderProgram->compile();
 
     glGenVertexArrays(1, &mVao);
     glGenBuffers(1, &mVbo);
@@ -52,16 +52,16 @@ void GLHelper::cleanup()
 {
     glDeleteVertexArrays(1, &mVao);
     glDeleteBuffers(1, &mVbo);
-    glDeleteProgram(mShaderProgram);
+    glDeleteProgram(mShaderProgram->name());
+
+    delete mShaderProgram;
 }
 
 void GLHelper::render()
 {
-    glClearColor(0.2f, 0.3f, 0.3f, 1.0f);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(mShaderProgram);
-    std::cout << "Shader = " << mShaderProgram << std::endl;
+    glUseProgram(mShaderProgram->name());
 
     glBindVertexArray(mVao);
     glDrawArrays(GL_TRIANGLES, 0, 3);
