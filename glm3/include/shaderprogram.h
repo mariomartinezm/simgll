@@ -16,6 +16,6 @@ public:
     GLvoid compile();
 
 private:
-    GLuint& mProgramName;
+    GLuint* mProgramName;
     std::vector<GLuint> mShaderObjects;
 };

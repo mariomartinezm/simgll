@@ -3,9 +3,9 @@
 #include "shaderprogram.h"
 
 ShaderProgram::ShaderProgram(GLuint& programName)
-    : mProgramName(programName)
+    : mProgramName(&programName)
 {
-    mProgramName = glCreateProgram();
+    *mProgramName = glCreateProgram();
 }
 
 ShaderProgram::~ShaderProgram()
@@ -58,20 +58,20 @@ GLvoid ShaderProgram::addShader(const std::string& filename, const GLenum& shade
 
     mShaderObjects.push_back(shaderObject);
 
-    glAttachShader(mProgramName, shaderObject);
+    glAttachShader(*mProgramName, shaderObject);
 }
 
 GLvoid ShaderProgram::compile()
 {
-    glLinkProgram(mProgramName);
+    glLinkProgram(*mProgramName);
 
     GLint success;
     GLchar infoLog[512];
 
-    glGetProgramiv(mProgramName, GL_LINK_STATUS, &success);
+    glGetProgramiv(*mProgramName, GL_LINK_STATUS, &success);
     if(!success)
     {
-        glGetProgramInfoLog(mProgramName, 512, nullptr, infoLog);
+        glGetProgramInfoLog(*mProgramName, 512, nullptr, infoLog);
 
         std::cerr << "Link Error: " << infoLog << std::endl;
 
