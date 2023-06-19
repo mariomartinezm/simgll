@@ -88,4 +88,6 @@ GLvoid ShaderProgram::compile()
     {
         glDeleteShader(shaderObject);
     }
+
+    mShaderObjects.clear();
 }
