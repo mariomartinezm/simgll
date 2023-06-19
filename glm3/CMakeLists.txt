@@ -1,4 +1,4 @@
-project(glm3)
+project(glm3 VERSION 0.1.0 DESCRIPTION "glm3 OpenGL utility library")
 
 set(CMAKE_CXX_VISIBILITY_PRESET     hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
