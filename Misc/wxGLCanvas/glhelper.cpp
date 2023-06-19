@@ -25,10 +25,10 @@ bool GLHelper::initData()
          0.0f,  0.5f, 0.0f,
     };
 
-    mShaderProgram = new ShaderProgram();
-    mShaderProgram->addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
-    mShaderProgram->addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-    mShaderProgram->compile();
+    ShaderProgram shaderProgram(mShaderProgram);
+    shaderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
+    shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
+    shaderProgram.compile();
 
     glGenVertexArrays(1, &mVao);
     glGenBuffers(1, &mVbo);
@@ -54,16 +54,14 @@ void GLHelper::cleanup()
 {
     glDeleteVertexArrays(1, &mVao);
     glDeleteBuffers(1, &mVbo);
-    glDeleteProgram(mShaderProgram->name());
-
-    delete mShaderProgram;
+    glDeleteProgram(mShaderProgram);
 }
 
 void GLHelper::render()
 {
     glClear(GL_COLOR_BUFFER_BIT);
 
-    glUseProgram(mShaderProgram->name());
+    glUseProgram(mShaderProgram);
 
     glBindVertexArray(mVao);
     glDrawArrays(GL_TRIANGLES, 0, 3);

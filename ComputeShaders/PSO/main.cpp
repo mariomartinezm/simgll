@@ -101,19 +101,21 @@ int main()
     glfwSetWindowUserPointer(window, (GLvoid*)&camera);
 
     // Create render and compute programs
-    ShaderProgram renderProgram;
-    renderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
-    renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-    renderProgram.compile();
+    GLuint renderProgram;
+    ShaderProgram shaderProgram(renderProgram);
+    shaderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
+    shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
+    shaderProgram.compile();
 
-    GLint mvpLocation = glGetUniformLocation(renderProgram.name(), "mvp");
+    GLint mvpLocation = glGetUniformLocation(renderProgram, "mvp");
 
-    ShaderProgram psoProgram;
-    psoProgram.addShader("pso.glsl", GL_COMPUTE_SHADER);
-    psoProgram.compile();
+    GLuint psoProgram;
+    shaderProgram.setProgramName(psoProgram);
+    shaderProgram.addShader("pso.glsl", GL_COMPUTE_SHADER);
+    shaderProgram.compile();
 
-    GLint omegaLocation   = glGetUniformLocation(psoProgram.name(), "omega");
-    GLint cpuSeedLocation = glGetUniformLocation(psoProgram.name(), "cpuSeed");
+    GLint omegaLocation   = glGetUniformLocation(psoProgram, "omega");
+    GLint cpuSeedLocation = glGetUniformLocation(psoProgram, "cpuSeed");
 
     // Create swarm buffers
     GLuint psoBuffers[2];
@@ -170,7 +172,7 @@ int main()
     glm::vec3 bestPosition = getBestPosition(p);
     std::cout << bestPosition.x << " " << bestPosition.y << " " << bestPosition.z << "\n";
 
-    GLint bestPositionLocation = glGetUniformLocation(psoProgram.name(), "bestPosition");
+    GLint bestPositionLocation = glGetUniformLocation(psoProgram, "bestPosition");
 
     glUnmapBuffer(GL_ARRAY_BUFFER);
 
@@ -232,7 +234,7 @@ int main()
 
         if(totalTime >= PSO_UPDATE_TIME && i < NUM_ITER)
         {
-            glUseProgram(psoProgram.name());
+            glUseProgram(psoProgram);
 
             glUniform1f(omegaLocation, omega);
             glUniform3f(bestPositionLocation, bestPosition.x, bestPosition.y, bestPosition.z);
@@ -277,7 +279,7 @@ int main()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        glUseProgram(renderProgram.name());
+        glUseProgram(renderProgram);
 
         // Render your GUI
         ImGui::Begin("PSO");
@@ -307,6 +309,9 @@ int main()
 
         glfwSwapBuffers(window);
     }
+
+    glDeleteProgram(renderProgram);
+    glDeleteProgram(psoProgram);
 
     glfwTerminate();
 

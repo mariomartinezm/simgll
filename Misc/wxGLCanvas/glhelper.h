@@ -16,5 +16,5 @@ public:
 private:
     GLuint mVao  = { 0 };
     GLuint mVbo  = { 0 };
-    ShaderProgram* mShaderProgram;
+    GLuint mShaderProgram = { 0 };
 };

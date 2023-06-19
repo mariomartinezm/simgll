@@ -58,7 +58,8 @@ int main()
     // Setup Dear Imgui style
     ImGui::StyleColorsDark();
 
-    ShaderProgram shaderProgram;
+    GLuint renderProgram;
+    ShaderProgram shaderProgram(renderProgram);
     shaderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
     shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
     shaderProgram.compile();
@@ -80,7 +81,7 @@ int main()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        glUseProgram(shaderProgram.name());
+        glUseProgram(renderProgram);
 
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -102,6 +103,8 @@ int main()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
+
+    glDeleteProgram(renderProgram);
 
     glfwTerminate();
 

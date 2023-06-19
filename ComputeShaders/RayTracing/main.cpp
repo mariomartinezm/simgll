@@ -65,18 +65,20 @@ int main()
 
     glfwSetWindowUserPointer(window, (GLvoid*)&camera);
 
-    ShaderProgram computeProgram;
-    computeProgram.addShader("compute_shader.glsl", GL_COMPUTE_SHADER);
-    computeProgram.compile();
+    GLuint computeProgram;
+    ShaderProgram shaderProgram(computeProgram);
+    shaderProgram.addShader("compute_shader.glsl", GL_COMPUTE_SHADER);
+    shaderProgram.compile();
 
-    GLint cpuSeedLocation      = glGetUniformLocation(computeProgram.name(), "cpuSeed");
-    GLint cameraPosLocation    = glGetUniformLocation(computeProgram.name(), "cameraPos");
-    GLint cameraTargetLocation = glGetUniformLocation(computeProgram.name(), "cameraTarget");
+    GLint cpuSeedLocation      = glGetUniformLocation(computeProgram, "cpuSeed");
+    GLint cameraPosLocation    = glGetUniformLocation(computeProgram, "cameraPos");
+    GLint cameraTargetLocation = glGetUniformLocation(computeProgram, "cameraTarget");
 
-    ShaderProgram renderProgram;
-    renderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
-    renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-    renderProgram.compile();
+    GLuint renderProgram;
+    shaderProgram.setProgramName(renderProgram);
+    shaderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
+    shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
+    shaderProgram.compile();
 
     GLuint vao, vbo, ebo;
     createQuad(vao, vbo, ebo);
@@ -100,7 +102,7 @@ int main()
 
         auto newTarget = camera.position + camera.target;
 
-        glUseProgram(computeProgram.name());
+        glUseProgram(computeProgram);
 
         glUniform1ui(cpuSeedLocation, rand());
         glUniform3f(cameraPosLocation, camera.position.x, camera.position.y, camera.position.z);
@@ -117,7 +119,7 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(renderProgram.name());
+        glUseProgram(renderProgram);
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, texture);
