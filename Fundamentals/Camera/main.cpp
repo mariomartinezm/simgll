@@ -29,7 +29,6 @@ int main()
     }
 
     glfwMakeContextCurrent(window);
-    glfwSetCursorPosCallback(window, cursor_pos_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glewExperimental = GL_TRUE;
@@ -53,12 +52,11 @@ int main()
 
     GLint mvpLocation = glGetUniformLocation(renderProgram, "mvp");
 
-    Camera camera;
-    camera.position = {0.0f, 0.5f,  3.5f};
-    camera.target   = {0.0f, 0.0f, -1.0f};
-    camera.up       = {0.0f, 1.0f,  0.0f};
-
-    glfwSetWindowUserPointer(window, (GLvoid*)&camera);
+    Camera camera(window,
+                  mvpLocation,
+                  glm::vec3{0.0f, 0.5f,  3.5f},
+                  glm::vec3{0.0f, 0.0f, -1.0f},
+                  glm::vec3{0.0f, 1.0f,  0.0f});
 
     GLfloat vertices[] =
     {
@@ -116,23 +114,9 @@ int main()
         oldTime   = startTime;
 
         glfwPollEvents();
-        poll_keyboard(window, deltaTime);
+        camera.update(deltaTime);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-        glm::vec3 newTarget = camera.position + camera.target;
-        auto mv_matrix = glm::lookAt(camera.position,
-                                     newTarget,
-                                     camera.up);
-
-        auto proj_matrix = glm::perspective(45.0F,
-                                            (float)(WIDTH) / HEIGHT,
-                                            0.1f,
-                                            100.0f);
-
-        auto mvp = proj_matrix * mv_matrix;
-
-        glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &mvp[0][0]);
 
         glUseProgram(renderProgram);
         glBindVertexArray(vao);

@@ -7,6 +7,7 @@ set(CMAKE_VISIBILITY_INLINES_HIDDEN YES)
 # leave the choice to the user
 add_library(${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PRIVATE
+    src/camera.cpp
     src/texture.cpp
     src/shaderprogram.cpp)
 target_sources(${PROJECT_NAME} PUBLIC
