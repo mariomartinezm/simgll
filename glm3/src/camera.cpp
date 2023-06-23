@@ -7,12 +7,10 @@
 #include "camera.h"
 
 Camera::Camera(GLFWwindow* window,
-               GLint mvpUniformLocation,
                glm::vec3 position,
                glm::vec3 target,
                glm::vec3 up) :
     mWindow(window),
-    mMvpUniformLocation(mvpUniformLocation),
     mPosition(position),
     mTarget(target),
     mUp(up)
@@ -71,10 +69,10 @@ void Camera::poll_cursor()
         mMouseInit = GL_FALSE;
     }
 
-    GLfloat offsetX       = (float)(mMouseX - xPos);
-    GLfloat offsetY       = (float)(mMouseY - yPos);
-    mMouseX               = (float)xPos;
-    mMouseY               = (float)yPos;
+    GLfloat offsetX       = (GLfloat)(mMouseX - xPos);
+    GLfloat offsetY       = (GLfloat)(mMouseY - yPos);
+    mMouseX               = (GLfloat)xPos;
+    mMouseY               = (GLfloat)yPos;
 
     float horizontalAngle = offsetX / 200.0f;
     float verticalAngle   = offsetY / 200.0f;
@@ -89,20 +87,18 @@ void Camera::poll_cursor()
     mTarget         = newTarget;
 }
 
-void Camera::update(const GLfloat deltaTime)
+glm::mat4x4 Camera::update(const GLfloat deltaTime)
 {
     poll_keyboard(deltaTime);
     poll_cursor();
 
-    auto mv_matrix   = glm::lookAt(mPosition, mPosition + mTarget, mUp);
+    auto view = glm::lookAt(mPosition, mPosition + mTarget, mUp);
 
     GLint width, height;
     glfwGetFramebufferSize(mWindow, &width, &height);
 
-    auto proj_matrix = glm::perspective(45.0F,
-                                        (GLfloat)(width) / height,
-                                        0.1F, 100.0F);
+    auto proj = glm::perspective(45.0F, (GLfloat)(width) / height, 0.1F,
+                                 100.0F);
 
-    auto mvp = proj_matrix * mv_matrix;
-    glUniformMatrix4fv(mMvpUniformLocation, 1, GL_FALSE, &mvp[0][0]);
+    return proj * view;
 }

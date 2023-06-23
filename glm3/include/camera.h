@@ -12,7 +12,6 @@ class GLM3_EXPORT Camera
 {
 public:
     Camera(GLFWwindow* window,
-           GLint mvpUniformLocation,
            glm::vec3 position,
            glm::vec3 target,
            glm::vec3 up);
@@ -20,11 +19,10 @@ public:
 
     void poll_keyboard(const GLfloat deltaTime);
     void poll_cursor();
-    void update(const GLfloat deltaTime);
+    glm::mat4x4 update(const GLfloat deltaTime);
 
 private:
     GLFWwindow* mWindow;
-    GLint mMvpUniformLocation    = { -1 };
 
     glm::vec3 mPosition          = { 0.0f, 0.0f, 0.0f };
     glm::vec3 mTarget            = { 0.0f, 0.0f, 0.0f };
