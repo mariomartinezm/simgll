@@ -21,6 +21,16 @@ Camera::~Camera()
 {
 }
 
+glm::vec3 Camera::position() const
+{
+    return mPosition;
+}
+
+glm::vec3 Camera::target() const
+{
+    return mTarget;
+}
+
 void Camera::poll_keyboard(const GLfloat deltaTime)
 {
     if(glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
@@ -87,7 +97,8 @@ void Camera::poll_cursor()
     mTarget         = newTarget;
 }
 
-glm::mat4x4 Camera::update(const GLfloat deltaTime)
+glm::mat4x4 Camera::update(const GLfloat deltaTime, GLfloat fov,
+                           GLfloat zNear, GLfloat zFar)
 {
     poll_keyboard(deltaTime);
     poll_cursor();
@@ -97,8 +108,7 @@ glm::mat4x4 Camera::update(const GLfloat deltaTime)
     GLint width, height;
     glfwGetFramebufferSize(mWindow, &width, &height);
 
-    auto proj = glm::perspective(45.0F, (GLfloat)(width) / height, 0.1F,
-                                 100.0F);
+    auto proj = glm::perspective(fov, (GLfloat)(width) / height, zNear, zFar);
 
     return proj * view;
 }

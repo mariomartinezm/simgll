@@ -1,6 +1,6 @@
 #pragma once
 
-#include <GL/GL.h>
+#include <GL/gl.h>
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
@@ -17,11 +17,16 @@ public:
            glm::vec3 up);
     ~Camera();
 
-    void poll_keyboard(const GLfloat deltaTime);
-    void poll_cursor();
-    glm::mat4x4 update(const GLfloat deltaTime);
+    glm::vec3 position() const;
+    glm::vec3 target() const;
+
+    glm::mat4x4 update(const GLfloat deltaTime, GLfloat fov = 45.0F,
+                       GLfloat zNear = 0.1F, GLfloat zFar = 100.0F);
 
 private:
+    void poll_keyboard(const GLfloat deltaTime);
+    void poll_cursor();
+
     GLFWwindow* mWindow;
 
     glm::vec3 mPosition          = { 0.0f, 0.0f, 0.0f };
