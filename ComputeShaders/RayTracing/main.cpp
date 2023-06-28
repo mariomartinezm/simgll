@@ -43,7 +43,6 @@ int main()
     }
 
     glfwMakeContextCurrent(window);
-    glfwSetCursorPosCallback(window, cursor_pos_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glewExperimental = GL_TRUE;
@@ -58,12 +57,10 @@ int main()
         exit(1);
     }
 
-    Camera camera;
-    camera.position = { 0.0f, 0.0f,  3.0f };
-    camera.target   = { 0.0f, 0.0f, -1.0f };
-    camera.up       = { 0.0f, 1.0f,  0.0f };
-
-    glfwSetWindowUserPointer(window, (GLvoid*)&camera);
+    Camera camera(window,
+                  glm::vec3{ 0.0f, 0.0f,  3.0f },
+                  glm::vec3{ 0.0f, 0.0f, -1.0f },
+                  glm::vec3{ 0.0f, 1.0f,  0.0f });
 
     GLuint computeProgram;
     ShaderProgram shaderProgram(computeProgram);
@@ -100,12 +97,12 @@ int main()
         deltaTime   = currentTime - oldTime;
         oldTime     = currentTime;
 
-        auto newTarget = camera.position + camera.target;
+        auto newTarget = camera.position() + camera.target();
 
         glUseProgram(computeProgram);
 
         glUniform1ui(cpuSeedLocation, rand());
-        glUniform3f(cameraPosLocation, camera.position.x, camera.position.y, camera.position.z);
+        glUniform3f(cameraPosLocation, camera.position().x, camera.position().y, camera.position().z);
         glUniform3f(cameraTargetLocation, newTarget.x, newTarget.y, newTarget.z);
 
         glBindImageTexture(0, texture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
@@ -115,7 +112,7 @@ int main()
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
 
         glfwPollEvents();
-        poll_keyboard(window, deltaTime);
+        camera.update(deltaTime);
 
         glClear(GL_COLOR_BUFFER_BIT);
 

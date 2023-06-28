@@ -53,7 +53,6 @@ int main()
     GLint mvpLocation = glGetUniformLocation(renderProgram, "mvp");
 
     Camera camera(window,
-                  mvpLocation,
                   glm::vec3{0.0f, 0.5f,  3.5f},
                   glm::vec3{0.0f, 0.0f, -1.0f},
                   glm::vec3{0.0f, 1.0f,  0.0f});
@@ -114,11 +113,14 @@ int main()
         oldTime   = startTime;
 
         glfwPollEvents();
-        camera.update(deltaTime);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         glUseProgram(renderProgram);
+
+        auto mvp = camera.update(deltaTime);
+        glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &mvp[0][0]);
+
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, 12, GL_UNSIGNED_INT, 0);
         glBindVertexArray(0);

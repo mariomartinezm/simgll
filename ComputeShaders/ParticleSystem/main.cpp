@@ -41,7 +41,6 @@ int main()
     }
 
     glfwMakeContextCurrent(window);
-    glfwSetCursorPosCallback(window, cursor_pos_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glewExperimental = GL_TRUE;
@@ -147,15 +146,12 @@ int main()
     shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
     shaderProgram.compile();
 
-    Camera camera;
-    camera.position = { 0.0f, 0.0f,  0.0f };
-    camera.target   = { 0.0f, 0.0f, -1.0f };
-    camera.up       = { 0.0f, 1.0f,  0.0f };
+    GLint mvpLocation = glGetUniformLocation(renderProgram, "mvp");
 
-    glfwSetWindowUserPointer(window, (GLvoid*)&camera);
-
-    glm::mat4 model(1.0f);
-    auto projection = glm::perspective(45.0f, float(WIDTH) / HEIGHT, 0.1f, 1000.0f);
+    Camera camera(window,
+                  glm::vec3{ 0.0f, 0.0f,  0.0f },
+                  glm::vec3{ 0.0f, 0.0f, -1.0f },
+                  glm::vec3{ 0.0f, 1.0f,  0.0f });
 
     glViewport(0, 0, WIDTH, HEIGHT);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -172,12 +168,6 @@ int main()
         oldTime     = currentTime;
 
         glfwPollEvents();
-        poll_keyboard(window, deltaTime);
-
-        auto newTarget = camera.position + camera.target;
-        auto view = glm::lookAt(camera.position, newTarget, camera.up);
-
-        auto mvp = projection * view * model;
 
         // Update the buffer containing the attractor positions and masses
         GLfloat* attractors = static_cast<GLfloat*>(glMapBufferRange(GL_UNIFORM_BUFFER,
@@ -216,8 +206,8 @@ int main()
 
         glUseProgram(renderProgram);
 
-        glUniformMatrix4fv(glGetUniformLocation(renderProgram, "mvp"),
-                           1, GL_FALSE, &mvp[0][0]);
+        auto mvp = camera.update(deltaTime, 45.0F, 0.1F, 1000.0F);
+        glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &mvp[0][0]);
 
         glBindVertexArray(vao);
 

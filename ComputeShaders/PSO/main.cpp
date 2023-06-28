@@ -67,7 +67,6 @@ int main()
     }
 
     glfwMakeContextCurrent(window);
-    glfwSetCursorPosCallback(window, cursor_pos_callback);
     //glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glewExperimental = GL_TRUE;
@@ -93,12 +92,10 @@ int main()
     // Setup Dear Imgui style
     ImGui::StyleColorsDark();
 
-    Camera camera;
-    camera.position = { 0.0f, 0.0f,  3.0f };
-    camera.target   = { 0.0f, 0.0f, -1.0f };
-    camera.up       = { 0.0f, 1.0f,  0.0f };
-
-    glfwSetWindowUserPointer(window, (GLvoid*)&camera);
+    Camera camera(window,
+                  glm::vec3{ 0.0f, 0.0f,  3.0f },
+                  glm::vec3{ 0.0f, 0.0f, -1.0f },
+                  glm::vec3{ 0.0f, 1.0f,  0.0f });
 
     // Create render and compute programs
     GLuint renderProgram;
@@ -270,7 +267,6 @@ int main()
         }
 
         glfwPollEvents();
-        poll_keyboard(window, deltaTime);
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
@@ -280,6 +276,7 @@ int main()
         ImGui::NewFrame();
 
         glUseProgram(renderProgram);
+        auto mvp = camera.update(deltaTime);
 
         // Render your GUI
         ImGui::Begin("PSO");
@@ -289,12 +286,6 @@ int main()
         ImGui::Text("Best Position = (%f, %f, %f)",
                     bestPosition.x, bestPosition.y, bestPosition.z);
         ImGui::Text("Best Fitness = %f", f(bestPosition));
-
-        auto newTarget  = camera.position + camera.target;
-        auto modelView  = glm::lookAt(camera.position, newTarget, camera.up);
-        auto projection = glm::perspective(45.0f, float(WIDTH) / HEIGHT, 0.1f,
-                                           100.0f);
-        auto mvp        = projection * modelView;
 
         glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &mvp[0][0]);
 

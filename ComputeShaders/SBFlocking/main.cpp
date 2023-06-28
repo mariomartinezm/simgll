@@ -54,7 +54,6 @@ int main()
     }
 
     glfwMakeContextCurrent(window);
-    glfwSetCursorPosCallback(window, cursor_pos_callback);
     glfwSetInputMode(window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     glewExperimental = GL_TRUE;
@@ -66,12 +65,10 @@ int main()
         exit(1);
     }
 
-    Camera camera;
-    camera.position = { 0.0f, 0.5f, -400.0f };
-    camera.target   = { 0.0f, 0.0f,    1.0f };
-    camera.up       = { 0.0f, 1.0f,    0.0f };
-
-    glfwSetWindowUserPointer(window, (GLvoid*)&camera);
+    Camera camera(window,
+                  glm::vec3{ 0.0f, 0.5f, -400.0f },
+                  glm::vec3{ 0.0f, 0.0f,    1.0f },
+                  glm::vec3{ 0.0f, 1.0f,    0.0f });
 
     GLuint flock_update_program;
     ShaderProgram shaderProgram(flock_update_program);
@@ -189,7 +186,6 @@ int main()
         oldTime   = startTime;
 
         glfwPollEvents();
-        poll_keyboard(window, deltaTime);
 
         static const float black[] = { 0.0F, 0.0F, 0.0F, 1.0F };
         static const float one = 1.0F;
@@ -214,18 +210,7 @@ int main()
         glClearBufferfv(GL_DEPTH, 0, &one);
 
         glUseProgram(flock_render_program);
-
-        glm::vec3 newTarget = camera.position + camera.target;
-        auto mv_matrix = glm::lookAt(camera.position,
-                                     newTarget,
-                                     camera.up);
-
-        auto proj_matrix = glm::perspective(45.0F,
-                                            (float)(WIDTH) / HEIGHT,
-                                            0.1f,
-                                            3000.0f);
-
-        auto mvp = proj_matrix * mv_matrix;
+        auto mvp = camera.update(deltaTime, 45.0F, 0.1F, 3000.0F);
 
         glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &mvp[0][0]);
 
