@@ -1,10 +1,19 @@
 #include <iostream>
+#include <vector>
 #include <GL/glew.h>
 #include <GLFW/glfw3.h>
+#include <glm/vec3.hpp>
+#include <glm/vec4.hpp>
 
 #include "shaderprogram.h"
 
 constexpr GLuint WIDTH = 512, HEIGHT = 512;
+
+struct Vertex
+{
+    glm::vec3 position;
+    glm::vec4 color;
+};
 
 int main()
 {
@@ -46,11 +55,10 @@ int main()
     shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
     shaderProgram.compile();
 
-    GLfloat vertices[] =
-    {
-         -0.5f, -0.5f,  0.0f,/*   1.0f, 0.0f, 0.0f, 1.0f,*/
-          0.5f, -0.5f,  0.0f,/*   0.0f, 1.0f, 0.0f, 1.0f,*/
-          0.0f,  0.5f,  0.0f,/*   0.0f, 0.0f, 1.0f, 1.0f,*/
+    std::vector<Vertex> vertices = {
+        Vertex{ {-0.5F, -0.5F,  0.0F}, {1.0F, 0.0F, 0.0F, 1.0F} },
+        Vertex{ { 0.5F, -0.5F,  0.0F}, {0.0F, 1.0F, 0.0F, 1.0F} },
+        Vertex{ { 0.0F,  0.5F,  0.0F}, {0.0F, 0.0F, 1.0F, 1.0F} },
     };
 
     GLuint vao, vbo;
@@ -61,11 +69,16 @@ int main()
     glBindVertexArray(vao);
 
     glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), vertices, GL_STATIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex),
+                 vertices.data(), GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-            3 * sizeof(GLfloat), (GLvoid*)0);
+            sizeof(Vertex), (GLvoid*)(offsetof(Vertex, position)));
     glEnableVertexAttribArray(0);
+
+    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE,
+            sizeof(Vertex), (GLvoid*)(offsetof(Vertex, color)));
+    glEnableVertexAttribArray(1);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
