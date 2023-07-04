@@ -63,24 +63,23 @@ int main()
 
     GLuint vao, vbo;
 
-    glGenVertexArrays(1, &vao);
-    glGenBuffers(1, &vbo);
+    glCreateBuffers(1, &vbo);
+    glNamedBufferStorage(vbo, vertices.size() * sizeof(Vertex),
+                         vertices.data(), GL_DYNAMIC_STORAGE_BIT);
 
-    glBindVertexArray(vao);
+    glCreateVertexArrays(1, &vao);
 
-    glBindBuffer(GL_ARRAY_BUFFER, vbo);
-    glBufferData(GL_ARRAY_BUFFER, vertices.size() * sizeof(Vertex),
-                 vertices.data(), GL_STATIC_DRAW);
+    glVertexArrayVertexBuffer(vao, 0, vbo, 0, sizeof(Vertex));
 
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE,
-            sizeof(Vertex), (GLvoid*)(offsetof(Vertex, position)));
-    glEnableVertexAttribArray(0);
+    glEnableVertexArrayAttrib(vao, 0);
+    glEnableVertexArrayAttrib(vao, 1);
 
-    glVertexAttribPointer(1, 4, GL_FLOAT, GL_FALSE,
-            sizeof(Vertex), (GLvoid*)(offsetof(Vertex, color)));
-    glEnableVertexAttribArray(1);
+    glVertexArrayAttribFormat(vao, 0, 3, GL_FLOAT, GL_FALSE, offsetof(Vertex, position));
+    glVertexArrayAttribFormat(vao, 1, 4, GL_FLOAT, GL_FALSE, offsetof(Vertex, color));
 
-    glBindBuffer(GL_ARRAY_BUFFER, 0);
+    glVertexArrayAttribBinding(vao, 0, 0);
+    glVertexArrayAttribBinding(vao, 1, 0);
+
     glBindVertexArray(0);
 
     glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
