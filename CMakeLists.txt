@@ -19,6 +19,7 @@ add_subdirectory(ComputeShaders/RayTracing)
 add_subdirectory(ComputeShaders/SBFlocking)
 add_subdirectory(ComputeShaders/TEAPRNG)
 add_subdirectory(ComputeShaders/TextureReadAndWrite)
+add_subdirectory(ComputeShaders/ElementWiseProduct)
 
 add_subdirectory(DearImGui/Demo)
 add_subdirectory(DearImGui/Test)
