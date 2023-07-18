@@ -107,7 +107,7 @@ int main()
     GLint mvpLocation = glGetUniformLocation(renderProgram, "mvp");
 
     GLuint psoProgram;
-    shaderProgram.setProgramName(psoProgram);
+    shaderProgram.setName(psoProgram);
     shaderProgram.addShader("pso.glsl", GL_COMPUTE_SHADER);
     shaderProgram.compile();
 

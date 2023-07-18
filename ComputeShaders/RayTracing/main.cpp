@@ -72,7 +72,7 @@ int main()
     GLint cameraTargetLocation = glGetUniformLocation(computeProgram, "cameraTarget");
 
     GLuint renderProgram;
-    shaderProgram.setProgramName(renderProgram);
+    shaderProgram.setName(renderProgram);
     shaderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
     shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
     shaderProgram.compile();

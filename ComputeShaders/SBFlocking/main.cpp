@@ -78,7 +78,7 @@ int main()
     GLint goalLocation = glGetUniformLocation(flock_update_program, "goal");
 
     GLuint flock_render_program;
-    shaderProgram.setProgramName(flock_render_program);
+    shaderProgram.setName(flock_render_program);
     shaderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
     shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
     shaderProgram.compile();

@@ -12,7 +12,7 @@ ShaderProgram::~ShaderProgram()
 {
 }
 
-GLvoid ShaderProgram::setProgramName(GLuint& programName)
+GLvoid ShaderProgram::setName(GLuint& programName)
 {
     mProgramName  = &programName;
     *mProgramName = glCreateProgram();
