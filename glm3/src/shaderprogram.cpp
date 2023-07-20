@@ -12,12 +12,6 @@ ShaderProgram::~ShaderProgram()
 {
 }
 
-GLvoid ShaderProgram::setName(GLuint& programName)
-{
-    mProgramName  = &programName;
-    *mProgramName = glCreateProgram();
-}
-
 GLvoid ShaderProgram::addShader(const std::string& filename, const GLenum& shaderType)
 {
     std::ifstream fs(filename);
