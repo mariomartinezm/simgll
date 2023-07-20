@@ -92,6 +92,11 @@ GLvoid ShaderProgram::compile()
     mShaderObjects.clear();
 }
 
+GLint ShaderProgram::getLocation(const std::string& name) const
+{
+    return glGetUniformLocation(mProgramName, name.c_str());
+}
+
 GLvoid ShaderProgram::use()
 {
     glUseProgram(mProgramName);

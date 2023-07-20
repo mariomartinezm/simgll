@@ -14,6 +14,8 @@ public:
 
     GLvoid addShader(const std::string& filename, const GLenum& shaderType);
     GLvoid compile();
+
+    GLint getLocation(const std::string& name) const;
     GLvoid use();
 
 private:
