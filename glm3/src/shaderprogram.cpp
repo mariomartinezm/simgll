@@ -91,3 +91,8 @@ GLvoid ShaderProgram::compile()
 
     mShaderObjects.clear();
 }
+
+GLvoid ShaderProgram::use()
+{
+    glUseProgram(mProgramName);
+}
