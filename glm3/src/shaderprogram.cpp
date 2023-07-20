@@ -11,6 +11,11 @@ ShaderProgram::~ShaderProgram()
     glDeleteProgram(mProgramName);
 }
 
+GLuint ShaderProgram::name() const
+{
+    return mProgramName;
+}
+
 GLvoid ShaderProgram::addShader(const std::string& filename, const GLenum& shaderType)
 {
     // Since we don't know when GLEW initialization happens it is better to

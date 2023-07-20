@@ -12,6 +12,8 @@ public:
     ShaderProgram();
     ~ShaderProgram();
 
+    GLuint name() const;
+
     GLvoid addShader(const std::string& filename, const GLenum& shaderType);
     GLvoid compile();
 
