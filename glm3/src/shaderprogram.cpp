@@ -2,18 +2,24 @@
 #include <sstream>
 #include "shaderprogram.h"
 
-ShaderProgram::ShaderProgram(GLuint& programName)
-    : mProgramName(&programName)
+ShaderProgram::ShaderProgram()
 {
-    *mProgramName = glCreateProgram();
 }
 
 ShaderProgram::~ShaderProgram()
 {
+    glDeleteProgram(mProgramName);
 }
 
 GLvoid ShaderProgram::addShader(const std::string& filename, const GLenum& shaderType)
 {
+    // Since we don't know when GLEW initialization happens it is better to
+    // create the program the first time addShader() is called
+    if (!mProgramName)
+    {
+        mProgramName = glCreateProgram();
+    }
+
     std::ifstream fs(filename);
 
     if(!fs)
@@ -37,7 +43,7 @@ GLvoid ShaderProgram::addShader(const std::string& filename, const GLenum& shade
     }
 
     std::string codeString = code.str();
-    const GLchar* codePtr = codeString.c_str(); 
+    const GLchar* codePtr = codeString.c_str();
 
     glShaderSource(shaderObject, 1, &codePtr, nullptr);
     glCompileShader(shaderObject);
@@ -58,20 +64,20 @@ GLvoid ShaderProgram::addShader(const std::string& filename, const GLenum& shade
 
     mShaderObjects.push_back(shaderObject);
 
-    glAttachShader(*mProgramName, shaderObject);
+    glAttachShader(mProgramName, shaderObject);
 }
 
 GLvoid ShaderProgram::compile()
 {
-    glLinkProgram(*mProgramName);
+    glLinkProgram(mProgramName);
 
     GLint success;
     GLchar infoLog[512];
 
-    glGetProgramiv(*mProgramName, GL_LINK_STATUS, &success);
+    glGetProgramiv(mProgramName, GL_LINK_STATUS, &success);
     if(!success)
     {
-        glGetProgramInfoLog(*mProgramName, 512, nullptr, infoLog);
+        glGetProgramInfoLog(mProgramName, 512, nullptr, infoLog);
 
         std::cerr << "Link Error: " << infoLog << std::endl;
 
