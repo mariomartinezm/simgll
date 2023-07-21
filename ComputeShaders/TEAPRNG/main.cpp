@@ -53,16 +53,16 @@ int main()
         exit(1);
     }
 
-    GLuint computeProgram;
-    ShaderProgram shaderProgram(computeProgram);
-    shaderProgram.addShader("compute_shader.glsl", GL_COMPUTE_SHADER);
-    shaderProgram.compile();
+    ShaderProgram computeProgram;
+    computeProgram.addShader("compute_shader.glsl", GL_COMPUTE_SHADER);
+    computeProgram.compile();
 
-    GLuint renderProgram;
-    shaderProgram.setName(renderProgram);
-    shaderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
-    shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-    shaderProgram.compile();
+    GLint cpuSeedLocation = computeProgram.getLocation("cpuSeed");
+
+    ShaderProgram renderProgram;
+    renderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
+    renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
+    renderProgram.compile();
 
     GLuint vao, vbo, ebo;
     createQuad(vao, vbo, ebo);
@@ -80,13 +80,13 @@ int main()
 
     while(!glfwWindowShouldClose(window))
     {
-        glUseProgram(computeProgram);
+        computeProgram.use();
 
         // Bind input and output images
         glBindImageTexture(0, ping, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI);
         glBindImageTexture(1, pong, 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA8UI);
 
-        glUniform1ui(glGetUniformLocation(computeProgram, "cpuSeed"), rand());
+        glUniform1ui(cpuSeedLocation, rand());
 
         glDispatchCompute(TEXTURE_WIDTH / 32, TEXTURE_HEIGHT / 32, 1);
 
@@ -97,7 +97,7 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(renderProgram);
+        renderProgram.use();
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, ping);
@@ -117,8 +117,6 @@ int main()
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
     glDeleteBuffers(1, &ebo);
-    glDeleteProgram(computeProgram);
-    glDeleteProgram(renderProgram);
 
     glfwTerminate();
 

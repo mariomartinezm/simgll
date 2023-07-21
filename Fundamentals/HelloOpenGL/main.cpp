@@ -49,11 +49,10 @@ int main()
 
     glViewport(0, 0, WIDTH, HEIGHT);
 
-    GLuint programName;
-    ShaderProgram shaderProgram(programName);
-    shaderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
-    shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-    shaderProgram.compile();
+    ShaderProgram renderProgram;
+    renderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
+    renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
+    renderProgram.compile();
 
     std::vector<Vertex> vertices = {
         Vertex{ {-0.5F, -0.5F,  0.0F}, {1.0F, 0.0F, 0.0F, 1.0F} },
@@ -90,7 +89,7 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(programName);
+        renderProgram.use();
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
         glBindVertexArray(0);
@@ -100,7 +99,6 @@ int main()
 
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
-    glDeleteProgram(programName);
 
     glfwTerminate();
 

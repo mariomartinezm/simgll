@@ -44,13 +44,12 @@ int main()
 
     glViewport(0, 0, WIDTH, HEIGHT);
 
-    GLuint renderProgram;
-    ShaderProgram shaderProgram(renderProgram);
-    shaderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
-    shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-    shaderProgram.compile();
+    ShaderProgram renderProgram;
+    renderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
+    renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
+    renderProgram.compile();
 
-    GLint mvpLocation = glGetUniformLocation(renderProgram, "mvp");
+    GLint mvpLocation = renderProgram.getLocation("mvp");
 
     Camera camera(window,
                   glm::vec3{0.0f, 0.5f,  3.5f},
@@ -116,7 +115,7 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-        glUseProgram(renderProgram);
+        renderProgram.use();
 
         auto mvp = camera.update(deltaTime);
         glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &mvp[0][0]);

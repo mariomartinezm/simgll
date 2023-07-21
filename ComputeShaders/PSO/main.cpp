@@ -98,21 +98,19 @@ int main()
                   glm::vec3{ 0.0f, 1.0f,  0.0f });
 
     // Create render and compute programs
-    GLuint renderProgram;
-    ShaderProgram shaderProgram(renderProgram);
-    shaderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
-    shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-    shaderProgram.compile();
+    ShaderProgram renderProgram;
+    renderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
+    renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
+    renderProgram.compile();
 
-    GLint mvpLocation = glGetUniformLocation(renderProgram, "mvp");
+    GLint mvpLocation = renderProgram.getLocation("mvp");
 
-    GLuint psoProgram;
-    shaderProgram.setName(psoProgram);
-    shaderProgram.addShader("pso.glsl", GL_COMPUTE_SHADER);
-    shaderProgram.compile();
+    ShaderProgram psoProgram;
+    psoProgram.addShader("pso.glsl", GL_COMPUTE_SHADER);
+    psoProgram.compile();
 
-    GLint omegaLocation   = glGetUniformLocation(psoProgram, "omega");
-    GLint cpuSeedLocation = glGetUniformLocation(psoProgram, "cpuSeed");
+    GLint omegaLocation   = psoProgram.getLocation("omega");
+    GLint cpuSeedLocation = psoProgram.getLocation("cpuSeed");
 
     // Create swarm buffers
     GLuint psoBuffers[2];
@@ -169,7 +167,7 @@ int main()
     glm::vec3 bestPosition = getBestPosition(p);
     std::cout << bestPosition.x << " " << bestPosition.y << " " << bestPosition.z << "\n";
 
-    GLint bestPositionLocation = glGetUniformLocation(psoProgram, "bestPosition");
+    GLint bestPositionLocation = psoProgram.getLocation("bestPosition");
 
     glUnmapBuffer(GL_ARRAY_BUFFER);
 
@@ -231,7 +229,7 @@ int main()
 
         if(totalTime >= PSO_UPDATE_TIME && i < NUM_ITER)
         {
-            glUseProgram(psoProgram);
+            psoProgram.use();
 
             glUniform1f(omegaLocation, omega);
             glUniform3f(bestPositionLocation, bestPosition.x, bestPosition.y, bestPosition.z);
@@ -275,7 +273,7 @@ int main()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        glUseProgram(renderProgram);
+        renderProgram.use();
         auto mvp = camera.update(deltaTime);
 
         // Render your GUI
@@ -300,9 +298,6 @@ int main()
 
         glfwSwapBuffers(window);
     }
-
-    glDeleteProgram(renderProgram);
-    glDeleteProgram(psoProgram);
 
     glfwTerminate();
 

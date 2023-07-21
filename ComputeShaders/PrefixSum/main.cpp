@@ -45,10 +45,9 @@ int main()
         exit(1);
     }
 
-    GLuint computeProgram;
-    ShaderProgram shaderProgram(computeProgram);
-    shaderProgram.addShader("compute_shader.glsl", GL_COMPUTE_SHADER);
-    shaderProgram.compile();
+    ShaderProgram computeProgram;
+    computeProgram.addShader("compute_shader.glsl", GL_COMPUTE_SHADER);
+    computeProgram.compile();
 
     GLuint dataBuffers[2];
 
@@ -70,8 +69,8 @@ int main()
 
     prefix_sum(inputData.data(), outputData.data(), NUM_ELEMENTS);
 
-    glShaderStorageBlockBinding(computeProgram, 0, 0);
-    glShaderStorageBlockBinding(computeProgram, 1, 1);
+    glShaderStorageBlockBinding(computeProgram.name(), 0, 0);
+    glShaderStorageBlockBinding(computeProgram.name(), 1, 1);
 
     while(!glfwWindowShouldClose(window))
     {
@@ -85,7 +84,7 @@ int main()
         glBindBufferRange(GL_SHADER_STORAGE_BUFFER, 1, dataBuffers[1], 0,
                           NUM_ELEMENTS * sizeof(GLfloat));
 
-        glUseProgram(computeProgram);
+        computeProgram.use();
         glDispatchCompute(1, 1, 1);
 
         glMemoryBarrier(GL_SHADER_STORAGE_BARRIER_BIT);
@@ -108,7 +107,6 @@ int main()
     }
 
     glDeleteBuffers(2, dataBuffers);
-    glDeleteProgram(computeProgram);
 
     glfwTerminate();
 

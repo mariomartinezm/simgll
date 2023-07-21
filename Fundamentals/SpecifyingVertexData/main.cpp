@@ -46,11 +46,10 @@ int main()
         exit(1);
     }
 
-    GLuint renderProgram;
-    ShaderProgram shaderProgram(renderProgram);
-    shaderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
-    shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-    shaderProgram.compile();
+    ShaderProgram renderProgram;
+    renderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
+    renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
+    renderProgram.compile();
 
     GLuint vao; GLuint vbo; GLuint ebo;
     createQuad(vao, vbo, ebo);
@@ -64,8 +63,8 @@ int main()
 
         // Render
         glClear(GL_COLOR_BUFFER_BIT);
-        glUseProgram(renderProgram);
 
+        renderProgram.use();
         glBindVertexArray(vao);
         glDrawElements(GL_TRIANGLES, NUM_VERTICES_QUAD, GL_UNSIGNED_INT,
                        static_cast<GLvoid*>(nullptr));
@@ -78,7 +77,6 @@ int main()
     glDeleteVertexArrays(1, &vao);
     glDeleteBuffers(1, &vbo);
     glDeleteBuffers(1, &ebo);
-    glDeleteProgram(renderProgram);
 
     glfwTerminate();
 

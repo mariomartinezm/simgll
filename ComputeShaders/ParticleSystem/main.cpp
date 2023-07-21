@@ -135,18 +135,18 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    GLuint computeProgram;
-    ShaderProgram shaderProgram(computeProgram);
-    shaderProgram.addShader("compute_shader.glsl", GL_COMPUTE_SHADER);
-    shaderProgram.compile();
+    ShaderProgram computeProgram;
+    computeProgram.addShader("compute_shader.glsl", GL_COMPUTE_SHADER);
+    computeProgram.compile();
 
-    GLuint renderProgram;
-    shaderProgram.setName(renderProgram);
-    shaderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
-    shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-    shaderProgram.compile();
+    GLint dtLocation = computeProgram.getLocation("dt");
 
-    GLint mvpLocation = glGetUniformLocation(renderProgram, "mvp");
+    ShaderProgram renderProgram;
+    renderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
+    renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
+    renderProgram.compile();
+
+    GLint mvpLocation = renderProgram.getLocation("mvp");
 
     Camera camera(window,
                   glm::vec3{ 0.0f, 0.0f,  0.0f },
@@ -189,12 +189,12 @@ int main()
 
         // Activate the compute program and bind the position and velocity
         // buffers
-        glUseProgram(computeProgram);
+        computeProgram.use();
 
         glBindImageTexture(0, tbos[0], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
         glBindImageTexture(1, tbos[1], 0, GL_FALSE, 0, GL_READ_WRITE, GL_RGBA32F);
 
-        glUniform1f(glGetUniformLocation(computeProgram, "dt"), 1.0f);
+        glUniform1f(dtLocation, 1.0f);
 
         glDispatchCompute(PARTICLE_GROUP_COUNT, 1, 1);
 
@@ -204,7 +204,7 @@ int main()
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glDisable(GL_DEPTH_TEST);
 
-        glUseProgram(renderProgram);
+        renderProgram.use();
 
         auto mvp = camera.update(deltaTime, 45.0F, 0.1F, 1000.0F);
         glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &mvp[0][0]);
@@ -217,9 +217,6 @@ int main()
 
         glfwSwapBuffers(window);
     }
-
-    glDeleteProgram(computeProgram);
-    glDeleteProgram(renderProgram);
 
     glfwTerminate();
 

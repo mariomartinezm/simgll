@@ -70,20 +70,18 @@ int main()
                   glm::vec3{ 0.0f, 0.0f,    1.0f },
                   glm::vec3{ 0.0f, 1.0f,    0.0f });
 
-    GLuint flock_update_program;
-    ShaderProgram shaderProgram(flock_update_program);
-    shaderProgram.addShader("flocking_cs.glsl", GL_COMPUTE_SHADER);
-    shaderProgram.compile();
+    ShaderProgram flockUpdateProgram;
+    flockUpdateProgram.addShader("flocking_cs.glsl", GL_COMPUTE_SHADER);
+    flockUpdateProgram.compile();
 
-    GLint goalLocation = glGetUniformLocation(flock_update_program, "goal");
+    GLint goalLocation = flockUpdateProgram.getLocation("goal");
 
-    GLuint flock_render_program;
-    shaderProgram.setName(flock_render_program);
-    shaderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
-    shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-    shaderProgram.compile();
+    ShaderProgram renderProgram;
+    renderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
+    renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
+    renderProgram.compile();
 
-    GLint mvpLocation = glGetUniformLocation(flock_render_program, "mvp");
+    GLint mvpLocation = renderProgram.getLocation("mvp");
 
     GLuint flock_buffers[2];
     glGenBuffers(2, flock_buffers);
@@ -190,7 +188,7 @@ int main()
         static const float black[] = { 0.0F, 0.0F, 0.0F, 1.0F };
         static const float one = 1.0F;
 
-        glUseProgram(flock_update_program);
+        flockUpdateProgram.use();
 
         glm::vec3 goal = glm::vec3(sinf(deltaTime * 0.34f),
                                    cosf(deltaTime * 0.29f),
@@ -209,7 +207,7 @@ int main()
         glClearBufferfv(GL_COLOR, 0, black);
         glClearBufferfv(GL_DEPTH, 0, &one);
 
-        glUseProgram(flock_render_program);
+        renderProgram.use();
         auto mvp = camera.update(deltaTime, 45.0F, 0.1F, 3000.0F);
 
         glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &mvp[0][0]);

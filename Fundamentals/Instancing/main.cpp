@@ -66,11 +66,12 @@ int main()
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 0, nullptr);
     glEnableVertexAttribArray(0);
 
-    GLuint grassProgram;
-    ShaderProgram shaderProgram(grassProgram);
-    shaderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
-    shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-    shaderProgram.compile();
+    ShaderProgram renderProgram;
+    renderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
+    renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
+    renderProgram.compile();
+
+    GLint mvpLocation = renderProgram.getLocation("mvp");
 
     glViewport(0, 0, WIDTH, HEIGHT);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -98,9 +99,8 @@ int main()
         auto prj = glm::perspective(45.0f, (GLfloat)(WIDTH) / HEIGHT, 0.1f, 1000.0f);
         auto mvp = prj * mv;
 
-        glUseProgram(grassProgram);
-        glUniformMatrix4fv(glGetUniformLocation(grassProgram, "mvp"),
-                           1, GL_FALSE, &mvp[0][0]);
+        renderProgram.use();
+        glUniformMatrix4fv(mvpLocation, 1, GL_FALSE, &mvp[0][0]);
 
         glBindVertexArray(grassVao);
         glDrawArraysInstanced(GL_TRIANGLE_STRIP, 0, 6, 1024 * 1024);
@@ -108,8 +108,6 @@ int main()
 
         glfwSwapBuffers(window);
     }
-
-    glDeleteProgram(grassProgram);
 
     return 0;
 }

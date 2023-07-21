@@ -59,11 +59,14 @@ int main()
     // Setup Dear Imgui style
     ImGui::StyleColorsDark();
 
-    GLuint renderProgram;
-    ShaderProgram shaderProgram(renderProgram);
-    shaderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
-    shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-    shaderProgram.compile();
+    ShaderProgram renderProgram;
+    renderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
+    renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
+    renderProgram.compile();
+
+    GLint rotationLoc    = renderProgram.getLocation("rotation");
+    GLint translationLoc = renderProgram.getLocation("translation");
+    GLint guiColorLoc    = renderProgram.getLocation("guiColor");
 
     GLuint vao, vbo, ebo;
     createGeometry(vao, vbo, ebo);
@@ -82,7 +85,7 @@ int main()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        glUseProgram(renderProgram);
+        renderProgram.use();
 
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -100,14 +103,14 @@ int main()
         static GLfloat color[4] = { 1.0f, 1.0f, 1.0f, 1.0f };
 
         // Pass the parameters to the shader
-        glUniform1f(glGetUniformLocation(renderProgram, "rotation"), rotation);
-        glUniform2fv(glGetUniformLocation(renderProgram, "translation"), 1, translation);
+        glUniform1f(rotationLoc, rotation);
+        glUniform2fv(translationLoc, 1, translation);
 
         // Color picker
         ImGui::ColorEdit3("color", color);
 
         // Multiply triangle's color with this color
-        glUniform3fv(glGetUniformLocation(renderProgram, "guiColor"), 1, color);
+        glUniform3fv(guiColorLoc, 1, color);
         ImGui::End();
 
         // Render dear imgui into screen
@@ -121,8 +124,6 @@ int main()
     ImGui_ImplOpenGL3_Shutdown();
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
-
-    glDeleteProgram(renderProgram);
 
     glfwTerminate();
 

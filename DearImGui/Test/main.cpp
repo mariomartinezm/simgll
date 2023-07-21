@@ -12,7 +12,7 @@
 constexpr GLuint WIDTH=512, HEIGHT=512;
 
 void error_cb(GLint error, const GLchar* description);
-void createGeometry(GLuint& vao, GLuint& vbo, GLuint& ebo);
+void createGeometry(GLuint& vao, GLuint& vbo);
 
 int main()
 {
@@ -58,14 +58,13 @@ int main()
     // Setup Dear Imgui style
     ImGui::StyleColorsDark();
 
-    GLuint renderProgram;
-    ShaderProgram shaderProgram(renderProgram);
-    shaderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
-    shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-    shaderProgram.compile();
+    ShaderProgram renderProgram;
+    renderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
+    renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
+    renderProgram.compile();
 
-    GLuint vao, vbo, ebo;
-    createGeometry(vao, vbo, ebo);
+    GLuint vao, vbo;
+    createGeometry(vao, vbo);
 
     glViewport(0, 0, WIDTH, HEIGHT);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
@@ -81,7 +80,7 @@ int main()
         ImGui_ImplGlfw_NewFrame();
         ImGui::NewFrame();
 
-        glUseProgram(renderProgram);
+        renderProgram.use();
 
         glBindVertexArray(vao);
         glDrawArrays(GL_TRIANGLES, 0, 3);
@@ -104,8 +103,6 @@ int main()
     ImGui_ImplGlfw_Shutdown();
     ImGui::DestroyContext();
 
-    glDeleteProgram(renderProgram);
-
     glfwTerminate();
 
     return 0;
@@ -116,7 +113,7 @@ void error_cb(GLint error, const GLchar* description)
     std::cerr << "GLFW error " << error << ": " << description << std::endl;
 }
 
-void createGeometry(GLuint& vao, GLuint& vbo, GLuint& ebo)
+void createGeometry(GLuint& vao, GLuint& vbo)
 {
     std::vector<GLfloat> vertices =
     {

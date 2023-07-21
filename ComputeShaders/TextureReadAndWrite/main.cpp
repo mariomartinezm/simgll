@@ -48,21 +48,22 @@ int main()
         exit(1);
     }
 
-    GLuint computeProgram;
-    ShaderProgram shaderProgram(computeProgram);
-    shaderProgram.addShader("compute_shader.glsl", GL_COMPUTE_SHADER);
-    shaderProgram.compile();
+    ShaderProgram computeProgram;
+    computeProgram.addShader("compute_shader.glsl", GL_COMPUTE_SHADER);
+    computeProgram.compile();
+
+    GLint imgInputLoc  = computeProgram.getLocation("imgInput");
+    GLint imgOutputLoc = computeProgram.getLocation("imgOutput");
 
     // Create input and output textures
     GLuint inputTexture  = createTextureObject(TEXTURE_WIDTH, TEXTURE_HEIGHT, true);
     GLuint outputTexture = createTextureObject(TEXTURE_WIDTH, TEXTURE_HEIGHT, false);
 
     // Create render program
-    GLuint renderProgram;
-    shaderProgram.setName(renderProgram);
-    shaderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
-    shaderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
-    shaderProgram.compile();
+    ShaderProgram renderProgram;
+    renderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
+    renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
+    renderProgram.compile();
 
     GLuint vao, vbo, ebo;
     createModel(vao, vbo, ebo);
@@ -85,10 +86,10 @@ int main()
         glBindImageTexture(1, outputTexture, 0, GL_FALSE, 0, GL_WRITE_ONLY, GL_RGBA32F);
 
         // Dispatch the compute shader
-        glUseProgram(computeProgram);
+        computeProgram.use();
 
-        glUniform1i(glGetUniformLocation(computeProgram, "imgInput"),  0);
-        glUniform1i(glGetUniformLocation(computeProgram, "imgOutput"), 1);
+        glUniform1i(imgInputLoc, 0);
+        glUniform1i(imgOutputLoc, 1);
 
         glDispatchCompute(TEXTURE_WIDTH / 32, TEXTURE_HEIGHT / 32, 1);
 
@@ -104,7 +105,7 @@ int main()
 
         glClear(GL_COLOR_BUFFER_BIT);
 
-        glUseProgram(renderProgram);
+        renderProgram.use();
 
         glActiveTexture(GL_TEXTURE0);
         glBindTexture(GL_TEXTURE_2D, inputTexture);
@@ -123,9 +124,6 @@ int main()
     glDeleteBuffers(1, &ebo);
 
     glDeleteVertexArrays(1, &vao);
-
-    glDeleteProgram(computeProgram);
-    glDeleteProgram(renderProgram);
 
     glfwTerminate();
 

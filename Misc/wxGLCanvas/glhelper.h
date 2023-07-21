@@ -1,6 +1,7 @@
 #pragma once
 
 #include <GL/glew.h>
+#include "shaderprogram.h"
 
 class GLHelper
 {
@@ -13,7 +14,7 @@ public:
     void cleanup();
 
 private:
+    ShaderProgram mShaderProgram;
     GLuint mVao  = { 0 };
     GLuint mVbo  = { 0 };
-    GLuint mShaderProgram = { 0 };
 };
