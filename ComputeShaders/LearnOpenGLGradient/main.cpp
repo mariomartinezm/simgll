@@ -65,15 +65,28 @@ int main()
     // Setup Dear Imgui style
     ImGui::StyleColorsDark();
 
+    // GL_MAX_COMPUTE_WORK_GROUP_SIZE contains the maximum number of work
+    // groups that can be dispatched in a single call to glDispatchCompute().
+    // The indices 0, 1 and 2 correspond to the x, y and z dimensions
+    // respectively.
     GLint64 workGroupCount[3];
     glGetInteger64i_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 0, &workGroupCount[0]);
     glGetInteger64i_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 1, &workGroupCount[1]);
     glGetInteger64i_v(GL_MAX_COMPUTE_WORK_GROUP_COUNT, 2, &workGroupCount[2]);
 
+    // GL_MAX_COMPUTE_WORK_GROUP_SIZE contains the maximum number of
+    // invocatoins per dimension within a workgroup.
     GLint workGroupSize[3];
     glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 0, &workGroupSize[0]);
     glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 1, &workGroupSize[1]);
     glGetIntegeri_v(GL_MAX_COMPUTE_WORK_GROUP_SIZE, 2, &workGroupSize[2]);
+
+    // GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS contains the maximum number of
+    // invocations per workgroup, i.e., the product of the x, y and z
+    // dimensions of the local size must be less than this value.
+    GLint64 workGroupInvocations;
+    glGetInteger64v(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS,
+                    &workGroupInvocations);
 
     ShaderProgram computeProgram;
     computeProgram.addShader("compute_shader.glsl", GL_COMPUTE_SHADER);
@@ -150,6 +163,8 @@ int main()
                     workGroupSize[0],
                     workGroupSize[1],
                     workGroupSize[2]);
+        ImGui::Text("GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS = %lld",
+                    workGroupInvocations);
         ImGui::Text("FPS = %3.2f", fps);
         ImGui::End();
 
