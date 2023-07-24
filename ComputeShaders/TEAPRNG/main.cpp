@@ -161,11 +161,11 @@ void createQuad(GLuint& vao, GLuint& vbo, GLuint& ebo)
     glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(elements), elements, GL_STATIC_DRAW);
 
     glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE,
-                          4 * sizeof(GL_FLOAT), static_cast<GLvoid*>(nullptr));
+                          4 * sizeof(GLfloat), static_cast<GLvoid*>(nullptr));
     glEnableVertexAttribArray(0);
 
     glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE,
-                          4 * sizeof(GL_FLOAT), (GLvoid*)(2 * sizeof(GLfloat)));
+                          4 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
     glEnableVertexAttribArray(1);
 
     glBindBuffer(GL_ARRAY_BUFFER, 0);
