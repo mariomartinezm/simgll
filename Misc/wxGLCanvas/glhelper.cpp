@@ -1,18 +1,11 @@
 #include "shaderprogram.h"
-
-#ifdef __WXMSW__
-    #include <GL/wglew.h>
-#elif defined(__WXGTK__)
-    #include <GL/glxew.h>
-#endif
-
 #include "glhelper.h"
 #include "shaderprogram.h"
 
 bool GLHelper::initGlew()
 {
     glewExperimental = GL_TRUE;
-    GLenum status = glewInit();
+    GLenum status    = glewInit();
 
     return status == GLEW_OK;
 }
@@ -46,6 +39,7 @@ bool GLHelper::initData()
 
     glClearColor(0.0F, 0.0F, 0.0F, 1.0F);
 
+
     return true;
 }
 
@@ -57,6 +51,8 @@ void GLHelper::cleanup()
 
 void GLHelper::render()
 {
+
+
     glClear(GL_COLOR_BUFFER_BIT);
 
     mShaderProgram.use();

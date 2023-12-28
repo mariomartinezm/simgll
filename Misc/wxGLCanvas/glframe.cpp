@@ -1,19 +1,30 @@
 #include "glframe.h"
-
 #include <wx/event.h>
+#include <wx/msgdlg.h>
 
 
 GLFrame::GLFrame(wxWindow* parent)
     : wxFrame(parent, wxID_ANY, wxString{})
 {
+    wxBoxSizer* topSizer = new wxBoxSizer(wxVERTICAL);
+
     // Create the canvas and context
     wxGLAttributes dispAttrs;
     dispAttrs.PlatformDefaults().RGBA().DoubleBuffer().EndList();
 
     mCanvas  = new wxGLCanvas(this, dispAttrs);
+    mStaticTextFPS = new wxStaticText(this, -1, "My text.", wxDefaultPosition,
+                                      wxSize(100, 60));
 
     mCanvas->Bind(wxEVT_SIZE, &GLFrame::OnCanvasSize, this);
     mCanvas->Bind(wxEVT_PAINT, &GLFrame::OnCanvasPaint, this);
+    mCanvas->Bind(wxEVT_IDLE, &GLFrame::OnIdle, this);
+
+    topSizer->Add(mCanvas, 1, wxEXPAND);
+    topSizer->Add(mStaticTextFPS,
+                  0,
+                  wxEXPAND);
+    SetSizerAndFit(topSizer);
 }
 
 GLFrame::~GLFrame()
@@ -51,14 +62,52 @@ void GLFrame::OnCanvasSize(wxSizeEvent& event)
 
     wxSize sz = event.GetSize();
     mHelper.setSize(sz.GetWidth(), sz.GetHeight());
+
+    end = std::chrono::high_resolution_clock::now();
 }
 
 void GLFrame::OnCanvasPaint(wxPaintEvent&)
 {
+    start   = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float> fms = start - end;
+    elapsed = fms.count();
+    end     = start;
+
+    if (counter < 500)
+    {
+        counter++;
+    }
+    else
+    {
+        mStaticTextFPS->SetLabelText(wxString::Format(wxT("%f"), elapsed));
+        counter = 0;
+    }
+
     wxPaintDC dc(mCanvas);
 
     mHelper.render();
     mCanvas->SwapBuffers();
+}
+
+void GLFrame::OnIdle(wxIdleEvent& evt)
+{
+    start   = std::chrono::high_resolution_clock::now();
+    std::chrono::duration<float> fms = start - end;
+    elapsed = fms.count();
+    end     = start;
+
+    if (counter < 500)
+    {
+        counter++;
+    }
+    else
+    {
+        mStaticTextFPS->SetLabelText(wxString::Format(wxT("%f"), elapsed));
+        counter = 0;
+    }
+
+    mHelper.render();
+    evt.RequestMore();
 }
 
 void GLFrame::initGL()
