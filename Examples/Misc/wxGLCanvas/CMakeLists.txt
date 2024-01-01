@@ -27,7 +27,7 @@ if(UNIX)
 
     target_link_libraries(${PROJECT_NAME} GL)
     target_link_libraries(${PROJECT_NAME} GLEW)
-    target_link_libraries(${PROJECT_NAME} glm3)
+    target_link_libraries(${PROJECT_NAME} simgll)
     target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES})
 endif()
 
@@ -37,6 +37,6 @@ if(WIN32)
 
     find_library(GLEW_LIB glew32)
     target_link_libraries(${PROJECT_NAME} ${GLEW_LIB})
-    target_link_libraries(${PROJECT_NAME} glm3)
+    target_link_libraries(${PROJECT_NAME} simgll)
     target_link_libraries(${PROJECT_NAME} ${wxWidgets_LIBRARIES})
 endif()
