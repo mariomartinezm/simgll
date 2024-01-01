@@ -4,9 +4,9 @@
 #include <vector>
 #include <GL/glew.h>
 
-#include "glm3_export.h"
+#include "simgll_export.h"
 
-class GLM3_EXPORT ShaderProgram
+class SIMGLL_EXPORT ShaderProgram
 {
 public:
     ShaderProgram();

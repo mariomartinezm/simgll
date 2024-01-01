@@ -4,11 +4,11 @@
 #include <glm/vec3.hpp>
 #include <glm/mat4x4.hpp>
 
-#include "glm3_export.h"
+#include "simgll_export.h"
 
 class GLFWwindow;
 
-class GLM3_EXPORT Camera
+class SIMGLL_EXPORT Camera
 {
 public:
     Camera(GLFWwindow* window,
