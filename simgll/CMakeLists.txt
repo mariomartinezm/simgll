@@ -9,14 +9,16 @@ add_library(${PROJECT_NAME})
 target_sources(${PROJECT_NAME} PRIVATE
     src/camera.cpp
     src/texture.cpp
-    src/shaderprogram.cpp)
+    src/shaderprogram.cpp
+    src/util.cpp)
 target_sources(${PROJECT_NAME} PUBLIC
     FILE_SET HEADERS
     BASE_DIRS include
     FILES
     include/camera.h
     include/shaderprogram.h
-    include/texture.h)
+    include/texture.h
+    include/util.h)
 
 target_compile_options(${PROJECT_NAME} PRIVATE -Wall -Wextra -Wpedantic)
 
