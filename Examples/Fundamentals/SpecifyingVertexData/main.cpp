@@ -5,6 +5,7 @@
 #include <GLFW/glfw3.h>
 
 #include "shaderprogram.h"
+#include "util.h"
 
 constexpr GLuint WIDTH  = 512;
 constexpr GLuint HEIGHT = 512;
@@ -45,6 +46,9 @@ int main()
         glfwTerminate();
         exit(1);
     }
+
+    glEnable(GL_DEBUG_OUTPUT);
+    glDebugMessageCallback(simgll::debug_callback, nullptr);
 
     ShaderProgram renderProgram;
     renderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
