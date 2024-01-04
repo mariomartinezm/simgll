@@ -88,11 +88,11 @@ int main()
     glGetInteger64v(GL_MAX_COMPUTE_WORK_GROUP_INVOCATIONS,
                     &workGroupInvocations);
 
-    ShaderProgram computeProgram;
+    simgll::ShaderProgram computeProgram;
     computeProgram.addShader("compute_shader.glsl", GL_COMPUTE_SHADER);
     computeProgram.compile(); GLint timeLocation = computeProgram.getLocation("time");
 
-    ShaderProgram renderProgram;
+    simgll::ShaderProgram renderProgram;
     renderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
     renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
     renderProgram.compile();

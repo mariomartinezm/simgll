@@ -8,33 +8,34 @@
 
 class GLFWwindow;
 
-class SIMGLL_EXPORT Camera
+namespace simgll
 {
-public:
-    Camera(GLFWwindow* window,
-           glm::vec3 position,
-           glm::vec3 target,
-           glm::vec3 up);
-    ~Camera();
+    class SIMGLL_EXPORT Camera
+    {
+    public:
+        Camera(GLFWwindow* window, glm::vec3 position, glm::vec3 target,
+               glm::vec3 up);
+        ~Camera();
 
-    glm::vec3 position() const;
-    glm::vec3 target() const;
+        glm::vec3 position() const;
+        glm::vec3 target() const;
 
-    glm::mat4x4 update(const GLfloat deltaTime, GLfloat fov = 45.0F,
-                       GLfloat zNear = 0.1F, GLfloat zFar = 100.0F);
+        glm::mat4x4 update(const GLfloat deltaTime, GLfloat fov = 45.0F,
+                           GLfloat zNear = 0.1F, GLfloat zFar = 100.0F);
 
-private:
-    void poll_keyboard(const GLfloat deltaTime);
-    void poll_cursor();
+    private:
+        void poll_keyboard(const GLfloat deltaTime);
+        void poll_cursor();
 
-    GLFWwindow* mWindow;
+        GLFWwindow* mWindow;
 
-    glm::vec3 mPosition          = { 0.0f, 0.0f, 0.0f };
-    glm::vec3 mTarget            = { 0.0f, 0.0f, 0.0f };
-    glm::vec3 mUp                = { 0.0f, 0.0f, 0.0f };
+        glm::vec3 mPosition  = { 0.0f, 0.0f, 0.0f };
+        glm::vec3 mTarget    = { 0.0f, 0.0f, 0.0f };
+        glm::vec3 mUp        = { 0.0f, 0.0f, 0.0f };
 
-    GLfloat   mSpeed             = { 5.0F };
-    GLdouble  mMouseX            = { 0.0F };
-    GLdouble  mMouseY            = { 0.0F };
-    GLboolean mMouseInit         = { GL_TRUE };
-};
+        GLfloat   mSpeed     = { 5.0F };
+        GLdouble  mMouseX    = { 0.0F };
+        GLdouble  mMouseY    = { 0.0F };
+        GLboolean mMouseInit = { GL_TRUE };
+    };
+}

@@ -65,18 +65,18 @@ int main()
         exit(1);
     }
 
-    Camera camera(window,
+    simgll::Camera camera(window,
                   glm::vec3{ 0.0f, 0.5f, -400.0f },
                   glm::vec3{ 0.0f, 0.0f,    1.0f },
                   glm::vec3{ 0.0f, 1.0f,    0.0f });
 
-    ShaderProgram flockUpdateProgram;
+    simgll::ShaderProgram flockUpdateProgram;
     flockUpdateProgram.addShader("flocking_cs.glsl", GL_COMPUTE_SHADER);
     flockUpdateProgram.compile();
 
     GLint goalLocation = flockUpdateProgram.getLocation("goal");
 
-    ShaderProgram renderProgram;
+    simgll::ShaderProgram renderProgram;
     renderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
     renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
     renderProgram.compile();

@@ -135,23 +135,23 @@ int main()
     glBindBuffer(GL_ARRAY_BUFFER, 0);
     glBindVertexArray(0);
 
-    ShaderProgram computeProgram;
+    simgll::ShaderProgram computeProgram;
     computeProgram.addShader("compute_shader.glsl", GL_COMPUTE_SHADER);
     computeProgram.compile();
 
     GLint dtLocation = computeProgram.getLocation("dt");
 
-    ShaderProgram renderProgram;
+    simgll::ShaderProgram renderProgram;
     renderProgram.addShader("vertex_shader.glsl",   GL_VERTEX_SHADER);
     renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
     renderProgram.compile();
 
     GLint mvpLocation = renderProgram.getLocation("mvp");
 
-    Camera camera(window,
-                  glm::vec3{ 0.0f, 0.0f,  0.0f },
-                  glm::vec3{ 0.0f, 0.0f, -1.0f },
-                  glm::vec3{ 0.0f, 1.0f,  0.0f });
+    simgll::Camera camera(window,
+                          glm::vec3{ 0.0f, 0.0f,  0.0f },
+                          glm::vec3{ 0.0f, 0.0f, -1.0f },
+                          glm::vec3{ 0.0f, 1.0f,  0.0f });
 
     glViewport(0, 0, WIDTH, HEIGHT);
     glClearColor(0.0f, 0.0f, 0.0f, 1.0f);

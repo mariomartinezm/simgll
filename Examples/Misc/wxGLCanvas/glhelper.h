@@ -14,7 +14,7 @@ public:
     void cleanup();
 
 private:
-    ShaderProgram mShaderProgram;
+    simgll::ShaderProgram mShaderProgram;
     GLuint mVao  = { 0 };
     GLuint mVbo  = { 0 };
 };

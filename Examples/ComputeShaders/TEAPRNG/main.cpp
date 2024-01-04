@@ -53,13 +53,13 @@ int main()
         exit(1);
     }
 
-    ShaderProgram computeProgram;
+    simgll::ShaderProgram computeProgram;
     computeProgram.addShader("compute_shader.glsl", GL_COMPUTE_SHADER);
     computeProgram.compile();
 
     GLint cpuSeedLocation = computeProgram.getLocation("cpuSeed");
 
-    ShaderProgram renderProgram;
+    simgll::ShaderProgram renderProgram;
     renderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
     renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
     renderProgram.compile();

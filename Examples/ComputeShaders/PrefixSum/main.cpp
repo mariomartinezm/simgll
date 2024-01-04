@@ -45,7 +45,7 @@ int main()
         exit(1);
     }
 
-    ShaderProgram computeProgram;
+    simgll::ShaderProgram computeProgram;
     computeProgram.addShader("compute_shader.glsl", GL_COMPUTE_SHADER);
     computeProgram.compile();
 

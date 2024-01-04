@@ -2,21 +2,22 @@
 #include <sstream>
 #include "shaderprogram.h"
 
-ShaderProgram::ShaderProgram()
+simgll::ShaderProgram::ShaderProgram()
 {
 }
 
-ShaderProgram::~ShaderProgram()
+simgll::ShaderProgram::~ShaderProgram()
 {
     glDeleteProgram(mProgramName);
 }
 
-GLuint ShaderProgram::name() const
+GLuint simgll::ShaderProgram::name() const
 {
     return mProgramName;
 }
 
-GLvoid ShaderProgram::addShader(const std::string& filename, const GLenum& shaderType)
+GLvoid simgll::ShaderProgram::addShader(const std::string& filename,
+                                        const GLenum& shaderType)
 {
     // Since we don't know when GLEW initialization happens it is better to
     // create the program the first time addShader() is called
@@ -72,7 +73,7 @@ GLvoid ShaderProgram::addShader(const std::string& filename, const GLenum& shade
     glAttachShader(mProgramName, shaderObject);
 }
 
-GLvoid ShaderProgram::compile()
+GLvoid simgll::ShaderProgram::compile()
 {
     glLinkProgram(mProgramName);
 
@@ -97,12 +98,12 @@ GLvoid ShaderProgram::compile()
     mShaderObjects.clear();
 }
 
-GLint ShaderProgram::getLocation(const std::string& name) const
+GLint simgll::ShaderProgram::getLocation(const std::string& name) const
 {
     return glGetUniformLocation(mProgramName, name.c_str());
 }
 
-GLvoid ShaderProgram::use()
+GLvoid simgll::ShaderProgram::use()
 {
     glUseProgram(mProgramName);
 }

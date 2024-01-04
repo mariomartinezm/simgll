@@ -1,5 +1,4 @@
-#ifndef UTIL_H
-#define UTIL_H
+#pragma once
 
 #include <iostream>
 #include <GL/glew.h>
@@ -12,5 +11,3 @@ namespace simgll
                                       GLenum severity, GLsizei length, GLchar
                                       const* message, void const* user_param);
 }
-
-#endif

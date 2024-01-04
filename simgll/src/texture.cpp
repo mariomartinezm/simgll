@@ -3,7 +3,7 @@
 
 using std::cout;
 
-GLuint createTextureObject(const char* filename)
+GLuint simgll::createTextureObject(const char* filename)
 {
     FREE_IMAGE_FORMAT format = FreeImage_GetFileType(filename, 0);
 

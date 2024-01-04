@@ -59,7 +59,7 @@ int main()
     // Setup Dear Imgui style
     ImGui::StyleColorsDark();
 
-    ShaderProgram renderProgram;
+    simgll::ShaderProgram renderProgram;
     renderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
     renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
     renderProgram.compile();

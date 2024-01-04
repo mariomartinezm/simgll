@@ -92,20 +92,20 @@ int main()
     // Setup Dear Imgui style
     ImGui::StyleColorsDark();
 
-    Camera camera(window,
-                  glm::vec3{ 0.0f, 0.0f,  3.0f },
-                  glm::vec3{ 0.0f, 0.0f, -1.0f },
-                  glm::vec3{ 0.0f, 1.0f,  0.0f });
+    simgll::Camera camera(window,
+                          glm::vec3{ 0.0f, 0.0f,  3.0f },
+                          glm::vec3{ 0.0f, 0.0f, -1.0f },
+                          glm::vec3{ 0.0f, 1.0f,  0.0f });
 
     // Create render and compute programs
-    ShaderProgram renderProgram;
+    simgll::ShaderProgram renderProgram;
     renderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
     renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
     renderProgram.compile();
 
     GLint mvpLocation = renderProgram.getLocation("mvp");
 
-    ShaderProgram psoProgram;
+    simgll::ShaderProgram psoProgram;
     psoProgram.addShader("pso.glsl", GL_COMPUTE_SHADER);
     psoProgram.compile();
 

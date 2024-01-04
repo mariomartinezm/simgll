@@ -5,4 +5,7 @@
 
 #include "simgll_export.h"
 
-SIMGLL_EXPORT GLuint createTextureObject(const char* filename);
+namespace simgll
+{
+    SIMGLL_EXPORT GLuint createTextureObject(const char* filename);
+}

@@ -6,7 +6,7 @@
 
 #include "camera.h"
 
-Camera::Camera(GLFWwindow* window,
+simgll::Camera::Camera(GLFWwindow* window,
                glm::vec3 position,
                glm::vec3 target,
                glm::vec3 up) :
@@ -17,21 +17,21 @@ Camera::Camera(GLFWwindow* window,
 {
 }
 
-Camera::~Camera()
+simgll::Camera::~Camera()
 {
 }
 
-glm::vec3 Camera::position() const
+glm::vec3 simgll::Camera::position() const
 {
     return mPosition;
 }
 
-glm::vec3 Camera::target() const
+glm::vec3 simgll::Camera::target() const
 {
     return mTarget;
 }
 
-void Camera::poll_keyboard(const GLfloat deltaTime)
+void simgll::Camera::poll_keyboard(const GLfloat deltaTime)
 {
     if(glfwGetKey(mWindow, GLFW_KEY_ESCAPE) == GLFW_PRESS)
     {
@@ -65,7 +65,7 @@ void Camera::poll_keyboard(const GLfloat deltaTime)
     }
 }
 
-void Camera::poll_cursor()
+void simgll::Camera::poll_cursor()
 {
     GLdouble xPos, yPos;
 
@@ -97,8 +97,8 @@ void Camera::poll_cursor()
     mTarget         = newTarget;
 }
 
-glm::mat4x4 Camera::update(const GLfloat deltaTime, GLfloat fov,
-                           GLfloat zNear, GLfloat zFar)
+glm::mat4x4 simgll::Camera::update(const GLfloat deltaTime, GLfloat fov,
+                                   GLfloat zNear, GLfloat zFar)
 {
     poll_keyboard(deltaTime);
     poll_cursor();

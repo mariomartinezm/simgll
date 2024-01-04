@@ -44,17 +44,17 @@ int main()
 
     glViewport(0, 0, WIDTH, HEIGHT);
 
-    ShaderProgram renderProgram;
+    simgll::ShaderProgram renderProgram;
     renderProgram.addShader("vertex_shader.glsl", GL_VERTEX_SHADER);
     renderProgram.addShader("fragment_shader.glsl", GL_FRAGMENT_SHADER);
     renderProgram.compile();
 
     GLint mvpLocation = renderProgram.getLocation("mvp");
 
-    Camera camera(window,
-                  glm::vec3{0.0f, 0.5f,  3.5f},
-                  glm::vec3{0.0f, 0.0f, -1.0f},
-                  glm::vec3{0.0f, 1.0f,  0.0f});
+    simgll::Camera camera(window,
+                          glm::vec3{0.0f, 0.5f,  3.5f},
+                          glm::vec3{0.0f, 0.0f, -1.0f},
+                          glm::vec3{0.0f, 1.0f,  0.0f});
 
     GLfloat vertices[] =
     {
