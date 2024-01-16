@@ -52,9 +52,6 @@ int main()
     computeProgram.addShader("compute_shader.glsl", GL_COMPUTE_SHADER);
     computeProgram.compile();
 
-    GLint imgInputLoc  = computeProgram.getLocation("imgInput");
-    GLint imgOutputLoc = computeProgram.getLocation("imgOutput");
-
     // Create input and output textures
     GLuint inputTexture  = createTextureObject(TEXTURE_WIDTH, TEXTURE_HEIGHT, true);
     GLuint outputTexture = createTextureObject(TEXTURE_WIDTH, TEXTURE_HEIGHT, false);
