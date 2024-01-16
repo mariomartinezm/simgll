@@ -88,9 +88,6 @@ int main()
         // Dispatch the compute shader
         computeProgram.use();
 
-        glUniform1i(imgInputLoc, 0);
-        glUniform1i(imgOutputLoc, 1);
-
         glDispatchCompute(TEXTURE_WIDTH / 32, TEXTURE_HEIGHT / 32, 1);
 
         glMemoryBarrier(GL_SHADER_IMAGE_ACCESS_BARRIER_BIT | GL_TEXTURE_FETCH_BARRIER_BIT);
